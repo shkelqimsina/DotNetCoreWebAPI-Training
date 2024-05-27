@@ -20,5 +20,6 @@ Learn how to set up a .NET Core Web API project from scratch.
 
 Antarët:
 
-Shkelqim Sina
-Taulant Azemi
+Shkelqim Sina   
+Taulant Azemi   
+Ilmi Bunjaku    

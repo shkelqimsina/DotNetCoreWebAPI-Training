@@ -23,5 +23,5 @@ Antarët:
 Shkelqim Sina   
 Taulant Azemi   
 Ilmi Bunjaku    
-Adil Jusufi
+Adil Jusufi <br>
 Naim Azemi

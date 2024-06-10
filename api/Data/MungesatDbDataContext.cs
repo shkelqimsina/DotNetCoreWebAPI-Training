@@ -25,9 +25,25 @@ public class MungesatDbDataContext : DbContext
             .HasOne(k => k.Klasa)
             .WithOne(k => k.Kujdestari)
             .HasForeignKey<Klasa>(k => k.KujdestariId);
+
+        modelBuilder.Entity<KlasaLenda>()
+            .HasOne(kl => kl.Klasa)
+            .WithMany(k => k.KlasaLenda)
+            .HasForeignKey(kl => kl.KlasaId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<KlasaLenda>()
+            .HasOne(kl => kl.Lenda)
+            .WithMany(l => l.KlasaLenda)
+            .HasForeignKey(kl => kl.LendaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
 
     public DbSet<Nxenesi> Nxenesit { get; set; }
     public DbSet<Klasa> Klasat { get; set; }
     public DbSet<Kujdestari> Kujdestaret { get; set; }
+    public DbSet<Lenda> Lendet { get; set; }
+    public DbSet<KlasaLenda> KlasaLendet { get; set; }
+    public DbSet<Mungesa> Mungesat { get; set; }
 }

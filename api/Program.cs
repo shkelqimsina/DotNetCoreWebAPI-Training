@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddControllers();
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddDbContext<MungesatDbDataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -24,21 +28,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/tungbote", () =>
-{
-    return "Tungjatjeta Botë!";
-})
-.WithOpenApi();
-
-app.MapGet("/Pershendetje", (string Emri) =>
-{
-    return "Përshëndetje " + Emri + "!";
-})
-.WithOpenApi();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

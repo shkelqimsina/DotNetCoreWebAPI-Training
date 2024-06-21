@@ -9,7 +9,9 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<Klasa, KlasaDto>().ReverseMap();
+        CreateMap<KlasaDto, CreateKlasaRequestDto>().ReverseMap();
+        CreateMap<CreateKlasaRequestDto, KlasaDto>().ReverseMap();
         CreateMap<Nxenesi, NxenesiDto>().ReverseMap();
-        CreateMap<Kujdestari, KujdestariDto>().ReverseMap();
+        CreateMap<Kujdestari, KujdestariDto>().ReverseMap();    
     }
 }

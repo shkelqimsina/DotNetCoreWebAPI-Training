@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mungesat_shkolla", "Mungesat_shkolla\Mungesat_shkolla.csproj", "{E88F8631-56E0-4FA9-A898-05F747B05987}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E88F8631-56E0-4FA9-A898-05F747B05987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E88F8631-56E0-4FA9-A898-05F747B05987}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E88F8631-56E0-4FA9-A898-05F747B05987}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E88F8631-56E0-4FA9-A898-05F747B05987}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25AFF0A6-27D9-46FF-B32A-2F2CB5DA6769}
+	EndGlobalSection
+EndGlobal

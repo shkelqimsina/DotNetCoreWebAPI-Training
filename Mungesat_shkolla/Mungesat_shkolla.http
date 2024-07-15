@@ -1,0 +1,9 @@
+@Mungesat_shkolla_HostAddress = https://localhost:7129
+
+GET {{Mungesat_shkolla_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{Mungesat_shkolla_HostAddress}}/api/Kujdestaret
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3QyMEB0ZXN0MjAuY29tIiwiZ2l2ZW5fbmFtZSI6InRlc3QyMCIsIm5iZiI6MTcyMTA1MTE4NCwiZXhwIjoxNzIxNjU1OTg0LCJpYXQiOjE3MjEwNTExODR9.f91QXmfzQTXe-4vQ921MJxt1b10mLYFfxtIjeMGpiAPipEJCBP5BTws0ANrUy_apdSDuuXiQRMwPCVOFAr0u4g

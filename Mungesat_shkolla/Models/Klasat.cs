@@ -9,5 +9,6 @@
         public Kujdestari Kujdestari { get; set; }
         public List<Nxenesi> Nxenesit { get; set; }
         public List<KlasaLenda> KlasaLenda { get; set; }
+        // test
     }
 }

@@ -15,7 +15,7 @@ function SignForm() {
 
   return (
     <div
-      className="signForm position-relative d-flex"
+      className="signForm position-relative d-flex flex-column flex-lg-row"
       style={{ color: "black" }}
     >
       <img
@@ -25,7 +25,7 @@ function SignForm() {
         draggable="false"
       />
 
-      <div className="sign-text d-flex w-75">
+      <div className="sign-text d-flex w-100 w-lg-75">
         <div className="d-flex flex-column gap-2">
           <h1 className="fw-bold">
             {onSignIn ? " Sign in" : "Sign up"} to <br />{" "}
@@ -46,11 +46,15 @@ function SignForm() {
             </span>
           </p>
         </div>
-        <img src={manStanding} alt="Man Standing" />
+        <img
+          src={manStanding}
+          alt="Man Standing"
+          className="d-none d-lg-block"
+        />
       </div>
-      <div className="sign-form d-flex flex-column gap-4 w-50">
+      <div className="sign-form d-flex flex-column gap-4 w-100 w-lg-50">
         <h2 className="mb-4 fw-semibold">{onSignIn ? "Sign in" : "Sign up"}</h2>
-        <form className="w-75 d-flex flex-column gap-4">
+        <form className="w-100 w-lg-75 d-flex flex-column gap-4">
           <input
             className="border-0 px-4 rounded-3"
             type="email"

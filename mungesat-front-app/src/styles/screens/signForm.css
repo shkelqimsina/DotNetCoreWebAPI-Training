@@ -1,4 +1,5 @@
 .signForm {
+  width: 100%;
   padding: 0 100px;
 }
 
@@ -58,4 +59,34 @@
 .sign-form .forgot-p {
   color: var(--secondary-text);
   cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+  .signForm {
+    padding: 0 60px;
+  }
+
+  .sign-form {
+    margin-top: 50px;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .signForm {
+    padding: 0 70px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .signForm {
+    padding: 0 20px;
+  }
+
+  .sign-text {
+    margin-top: 100px;
+  }
+
+  .sign-text h1 {
+    font-size: 2.7rem;
+  }
 }

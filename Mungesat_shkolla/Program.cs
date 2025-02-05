@@ -55,6 +55,18 @@ builder.Services.AddAuthentication(options =>
   };
 });
 
+
+// Add CORS service
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")  // React app origin (URL)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -63,6 +75,10 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
+// Use CORS
+app.UseCors("AllowReactApp");
+
 
 app.UseHttpsRedirection();
 

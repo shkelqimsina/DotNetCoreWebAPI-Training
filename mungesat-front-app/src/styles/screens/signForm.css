@@ -17,6 +17,7 @@
 
 .register-here {
   color: var(--primary-bg);
+  cursor: pointer;
 }
 
 .sign-form {

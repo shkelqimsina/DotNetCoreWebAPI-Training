@@ -1,0 +1,60 @@
+.signForm {
+  padding: 0 100px;
+}
+
+.sign-text {
+  margin-top: 180px;
+}
+
+.logo {
+  max-width: 150px;
+  width: 80%;
+}
+
+.sign-text h1 {
+  font-size: 3.2rem;
+}
+
+.register-here {
+  color: var(--primary-bg);
+}
+
+.sign-form {
+  margin-top: 150px;
+}
+
+.sign-form input {
+  height: 60px;
+  background-color: var(--secondary-bg);
+  color: var(--primary-text);
+  transition: all 400ms ease;
+}
+
+.sign-form input:focus {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--primary-bg);
+  caret-color: var(--secondary-text);
+}
+
+.sign-form input::placeholder {
+  color: var(--primary-text) !important;
+}
+
+.eye {
+  color: var(--primary-text);
+  cursor: pointer;
+}
+
+.sign-form .sign-btn {
+  height: 60px;
+  background-color: var(--primary-bg);
+  color: var(--white);
+  box-shadow: 0px 0px 50px -10px var(--primary-bg);
+}
+
+.sign-form .forgot-p {
+  color: var(--secondary-text);
+  cursor: pointer;
+}

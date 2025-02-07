@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignForm from "./components/SignForm";
+import SignForm from "./screens/SignForm.jsx";
+import Dashboard from "./screens/Dashboard.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SignForm />} />
+        <Route path="/sign" element={<SignForm />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );

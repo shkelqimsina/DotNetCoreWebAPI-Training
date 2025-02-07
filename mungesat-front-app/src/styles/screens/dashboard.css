@@ -4,8 +4,8 @@
 }
 
 .sidebar {
-  width: 260px;
-  height: 100vh;
+  width: 300px !important;
+  height: 100vh !important;
   position: relative;
   box-shadow: 0 0 20px -10px var(--black);
   left: -100%;

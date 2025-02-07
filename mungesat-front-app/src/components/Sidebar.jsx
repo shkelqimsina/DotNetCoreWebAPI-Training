@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import SideItem from "./SideItem";
 import eMungesat from "../assets/logos/eMungesat.png";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { GoSidebarExpand } from "react-icons/go";
 import { GoSidebarCollapse } from "react-icons/go";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { PiStudentBold } from "react-icons/pi";
 import { FaUser } from "react-icons/fa";
 import { TbSettings } from "react-icons/tb";
+import { BiLogOut } from "react-icons/bi";
+import { MdErrorOutline } from "react-icons/md";
 
 function Sidebar() {
   const [showSidebar, setShowSidebar] = useState(true);
@@ -34,11 +35,33 @@ function Sidebar() {
               />
             </div>
             <div className="mt-5 p-0 w-100 d-flex flex-column gap-1">
-              <SideItem icon={<TbLayoutDashboardFilled />} title="Dashboard" />
-              <SideItem icon={<FaChalkboardTeacher />} title="Teachers" />
-              <SideItem icon={<PiStudentBold />} title="Students" />
-              <SideItem icon={<FaUser />} title="Profile" />
-              <SideItem icon={<TbSettings />} title="Settings" />
+              <SideItem
+                icon={<TbLayoutDashboardFilled />}
+                title="Paneli i kryesor"
+                path="/dashboard"
+              />
+              <SideItem
+                icon={<FaChalkboardTeacher />}
+                title="Mësimdhënësit"
+                path="/teacher"
+              />
+              <SideItem
+                icon={<PiStudentBold />}
+                title="Nxënësit"
+                path="/student"
+              />
+              <SideItem
+                icon={<MdErrorOutline />}
+                title="Mungesat"
+                path="/missings"
+              />
+              <SideItem icon={<FaUser />} title="Profili" path="/profile" />
+              <SideItem
+                icon={<TbSettings />}
+                title="Cilësimet"
+                path="/settings"
+              />
+              <SideItem icon={<BiLogOut />} title="Çkyqu" />
             </div>
           </div>
         </>

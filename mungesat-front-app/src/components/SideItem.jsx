@@ -7,7 +7,7 @@ function SideItem({ icon, title, path, className }) {
       className={({ isActive }) =>
         isActive
           ? "active side-item m-1 d-flex align-items-center gap-3 px-3 rounded-3 fs-6"
-          : `side-item d-flex align-items-center gap-3 px-3 rounded-3 ${className}`
+          : `side-item m-1 d-flex align-items-center gap-3 px-3 rounded-3 ${className}`
       }
     >
       <span className="scale-125">{icon}</span>

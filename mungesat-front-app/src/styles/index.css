@@ -3,6 +3,8 @@
 :root {
   --white: #fff;
   --black: #000;
+  --gray: #333;
+  --light-gray: #fcf9f9;
 
   /* backgrounds */
   --primary-bg: #4d47c3;
@@ -18,4 +20,5 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: "DM Sans", serif !important;
+  background-color: #f2f2f2;
 }

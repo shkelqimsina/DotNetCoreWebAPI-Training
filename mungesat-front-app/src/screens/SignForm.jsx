@@ -28,21 +28,21 @@ function SignForm() {
       <div className="sign-text d-flex w-100 w-lg-75">
         <div className="d-flex flex-column gap-2">
           <h1 className="fw-bold">
-            {onSignIn ? " Sign in" : "Sign up"} to <br />{" "}
-            <span className="fw-normal">eMungesat is simply</span>
+            {onSignIn ? " Kyçja" : "Regjistrimi"} tek <br />{" "}
+            <span className="fw-normal">eMungesat është i thjeshtë</span>
           </h1>
           <p className="mb-0">
             {" "}
-            If you {onSignIn ? "don’t have" : "have"} an account{" "}
-            {onSignIn ? "register" : "sign in"}
+            Nëse {onSignIn ? "nuk ke" : "ke"} një llogari,{" "}
+            {onSignIn ? "regjistrohu" : "kyçu"}!
           </p>
           <p>
-            You can{" "}
+            Ti mund të{" "}
             <span
               onClick={() => setOnSignIn(!onSignIn)}
               className="register-here fw-bold text-decoration-none"
             >
-              {onSignIn ? "Register " : "Sign In"} here!
+              {onSignIn ? "Regjistrohesh " : "Kyçesh"} këtu!
             </span>
           </p>
         </div>
@@ -80,7 +80,7 @@ function SignForm() {
           </div>
           {onSignIn ? (
             <a className="forgot-p text-end text-decoration-none">
-              Forgot password?
+              Keni fjalëkalimin?
             </a>
           ) : (
             <div className="d-flex position-relative">
@@ -103,7 +103,7 @@ function SignForm() {
             </div>
           )}
           <button className="sign-btn border-0 rounded-3 fw-semibold mt-3">
-            Sign In
+            {onSignIn ? "Kyçu" : "Regjistrohu"}
           </button>
         </form>
       </div>

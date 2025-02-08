@@ -10,17 +10,22 @@ function Teacher() {
       <Sidebar />
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between">
-          <h1>Mësimdhënësit</h1>
-          <AddButton>Shto Mësimdhënës</AddButton>
+          <h1>Kujdestarët</h1>
+          <AddButton>Shto Kujdestarë</AddButton>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
-          <Dropdown />
+          <Dropdown
+            main="Filtro"
+            option1="Emri"
+            option2="Mbiemri"
+            option3="Email"
+          />
           <SearchForm />
         </div>
         <div className="h-75 mt-4 d-flex flex-column justify-content-center align-items-center">
-          <h2>Nuk ka asnjë mësimdhënës!</h2>
+          <h2>Nuk ka asnjë kujdestarë!</h2>
           <p className="text-secondary">
-            Mësimdhënsit shfaqen atëherë kur janë shtuar.
+            Kujdestarët shfaqen atëherë kur janë shtuar.
           </p>
         </div>
       </div>

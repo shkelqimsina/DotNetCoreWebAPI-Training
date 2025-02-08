@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignForm from "./screens/SignForm";
 import Dashboard from "./screens/Dashboard";
 import Teacher from "./screens/Teacher";
+import Class from "./screens/Class";
 import Student from "./screens/Student";
 import Missings from "./screens/Missings";
 import Profile from "./screens/Profile";
@@ -14,10 +15,10 @@ function App() {
         <Route path="/sign" element={<SignForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/teacher" element={<Teacher />} />
+        <Route path="/class" element={<Class />} />
         <Route path="/student" element={<Student />} />
         <Route path="/missings" element={<Missings />} />
         <Route path="/settings" element={<Profile />} />
-        <Route path="/profile" element={<Settings />} />
       </Routes>
     </Router>
   );

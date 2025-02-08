@@ -46,6 +46,11 @@ function Sidebar() {
                 path="/teacher"
               />
               <SideItem
+                icon={<FaChalkboardTeacher />}
+                title="Klasët"
+                path="/class"
+              />
+              <SideItem
                 icon={<PiStudentBold />}
                 title="Nxënësit"
                 path="/student"
@@ -55,7 +60,6 @@ function Sidebar() {
                 title="Mungesat"
                 path="/missings"
               />
-              <SideItem icon={<FaUser />} title="Profili" path="/profile" />
               <SideItem
                 icon={<TbSettings />}
                 title="Cilësimet"

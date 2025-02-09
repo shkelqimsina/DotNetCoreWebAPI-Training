@@ -1,10 +1,17 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import SearchForm from "../components/SearchForm";
 
 function Student() {
+  const navigate = useNavigate();
+
+  const handleAddClick = () => {
+    navigate("/teacher-add");
+  };
+
   return (
     <div className="teacher h-100 w-100 d-flex">
       <Sidebar />

@@ -36,7 +36,7 @@ const DropdownMenu = styled.ul`
   margin: 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   min-width: 120px;
-  display: ${(props) => (props.isOpen ? "block" : "none")};
+  display: ${({isOpen}) => (isOpen ? "block" : "none")};
 `;
 
 const DropdownItem = styled.li`
@@ -50,18 +50,18 @@ const DropdownItem = styled.li`
   }
 `;
 
-const Dropdown = () => {
+const Dropdown = ({main, option1, option2, option3}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <DropdownContainer>
       <DropdownButton onClick={() => setIsOpen(!isOpen)}>
-        Add filter <Arrow>▼</Arrow>
+        {main} <Arrow>▼</Arrow>
       </DropdownButton>
       <DropdownMenu isOpen={isOpen}>
-        <DropdownItem>Option 1</DropdownItem>
-        <DropdownItem>Option 2</DropdownItem>
-        <DropdownItem>Option 3</DropdownItem>
+        <DropdownItem>{option1}</DropdownItem>
+        <DropdownItem>{option2}</DropdownItem>
+        <DropdownItem>{option3}</DropdownItem>
       </DropdownMenu>
     </DropdownContainer>
   );

@@ -36,7 +36,7 @@ const DropdownMenu = styled.ul`
   margin: 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   min-width: 120px;
-  display: ${({isOpen}) => (isOpen ? "block" : "none")};
+  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
 `;
 
 const DropdownItem = styled.li`
@@ -50,7 +50,7 @@ const DropdownItem = styled.li`
   }
 `;
 
-const Dropdown = ({main, option1, option2, option3}) => {
+const Dropdown = ({ main, option1, option2, option3 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -67,4 +67,24 @@ const Dropdown = ({main, option1, option2, option3}) => {
   );
 };
 
+const GenderDropdown = styled.select`
+  height: 60px;
+  background-color: var(--secondary-bg);
+  color: var(--primary-text);
+  transition: all 400ms ease;
+
+  &:focus {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: var(--primary-bg);
+    caret-color: var(--secondary-text);
+  }
+
+  &::placeholder {
+    color: var(--primary-text) !important;
+  }
+`;
+
 export default Dropdown;
+export { GenderDropdown };

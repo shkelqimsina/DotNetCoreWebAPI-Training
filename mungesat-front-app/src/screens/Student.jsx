@@ -9,7 +9,7 @@ function Student() {
   const navigate = useNavigate();
 
   const handleAddClick = () => {
-    navigate("/teacher-add");
+    navigate("/student-add");
   };
 
   return (
@@ -18,7 +18,7 @@ function Student() {
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between">
           <h1>Nxënësit</h1>
-          <AddButton>Shto Nxënës</AddButton>
+          <AddButton onClick={handleAddClick}>Shto Nxënës</AddButton>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown

@@ -1,17 +1,24 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import SearchForm from "../components/SearchForm";
 
 function Student() {
+  const navigate = useNavigate();
+
+  const handleAddClick = () => {
+    navigate("/student-add");
+  };
+
   return (
     <div className="teacher h-100 w-100 d-flex">
       <Sidebar />
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between">
           <h1>Nxënësit</h1>
-          <AddButton>Shto Nxënës</AddButton>
+          <AddButton onClick={handleAddClick}>Shto Nxënës</AddButton>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown

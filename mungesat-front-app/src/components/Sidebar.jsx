@@ -42,7 +42,7 @@ function Sidebar() {
               />
               <SideItem
                 icon={<FaChalkboardTeacher />}
-                title="Mësimdhënësit"
+                title="Kujdestarët"
                 path="/teacher"
               />
               <SideItem

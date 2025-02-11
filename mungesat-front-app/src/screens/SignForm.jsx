@@ -55,8 +55,31 @@ function SignForm() {
         />
       </div>
       <div className="sign-form d-flex flex-column gap-4 w-100 w-lg-50">
-        <h2 className="mb-4 fw-semibold">{onSignIn ? "Sign in" : "Sign up"}</h2>
+        <h2 className="mb-4 fw-semibold">
+          {onSignIn ? "Kyqu" : "Regjistrohu"}
+        </h2>
         <form className="w-100 w-lg-75 d-flex flex-column gap-4">
+          {!onSignIn && (
+            <>
+              <Input
+                className="border-0 px-4 rounded-3"
+                type="text"
+                placeholder="Username"
+              />
+              <div className="d-flex gap-3 w-100">
+                <Input
+                  className="border-0 px-4 rounded-3 w-50"
+                  type="text"
+                  placeholder="First Name"
+                />
+                <Input
+                  className="border-0 px-4 rounded-3 w-50"
+                  type="text"
+                  placeholder="Last Name"
+                />
+              </div>
+            </>
+          )}
           <Input
             className="border-0 px-4 rounded-3"
             type="email"
@@ -80,29 +103,10 @@ function SignForm() {
               />
             )}
           </div>
-          {onSignIn ? (
+          {onSignIn && (
             <a className="forgot-p text-end text-decoration-none">
               Keni fjalëkalimin?
             </a>
-          ) : (
-            <div className="d-flex position-relative">
-              <Input
-                className="border-0 px-4 rounded-3 w-100 pe-5"
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-              />
-              {!showPassword ? (
-                <FaEyeSlash
-                  onClick={togglePassword}
-                  className="eye position-absolute top-50 translate-middle-y end-0 me-3"
-                />
-              ) : (
-                <FaEye
-                  onClick={togglePassword}
-                  className="eye position-absolute top-50 translate-middle-y end-0 me-3"
-                />
-              )}
-            </div>
           )}
           <SignButton className="sign-btn border-0 rounded-3 fw-semibold mt-3">
             {onSignIn ? "Kyçu" : "Regjistrohu"}

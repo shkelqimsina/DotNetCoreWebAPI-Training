@@ -11,10 +11,65 @@ function SignForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [onSignIn, setOnSignIn] = useState(true);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [formData, setFormData] = useState({
+    username: "",
+    fname: "",
+    lname: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    // Update the corresponding field in formData
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value, // This ensures only the updated field changes
+    }));
+  };
+
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccessMessage("");
+    console.log("Form data: ", formData);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5050/api/account/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to register user");
+      }
+
+      const data = await response.json();
+      setSuccessMessage(data.message);
+      console.log("User Registered Succesfully: ", data.message);
+    } catch (error) {
+      setError(error.message);
+      console.error("Error: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div
       className="signForm position-relative d-flex flex-column flex-lg-row"
@@ -65,17 +120,26 @@ function SignForm() {
                 className="border-0 px-4 rounded-3"
                 type="text"
                 placeholder="Username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
               />
               <div className="d-flex gap-3 w-100">
                 <Input
                   className="border-0 px-4 rounded-3 w-50"
                   type="text"
                   placeholder="First Name"
+                  name="fname"
+                  value={formData.fname}
+                  onChange={handleChange}
                 />
                 <Input
                   className="border-0 px-4 rounded-3 w-50"
                   type="text"
                   placeholder="Last Name"
+                  name="lname"
+                  value={formData.lname}
+                  onChange={handleChange}
                 />
               </div>
             </>
@@ -84,12 +148,18 @@ function SignForm() {
             className="border-0 px-4 rounded-3"
             type="email"
             placeholder="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
           />
           <div className="d-flex position-relative">
             <Input
               className="border-0 px-4 rounded-3 w-100 pe-5"
               type={showPassword ? "text" : "password"}
               placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
             />
             {!showPassword ? (
               <FaEyeSlash
@@ -108,7 +178,11 @@ function SignForm() {
               Keni fjalëkalimin?
             </a>
           )}
-          <SignButton className="sign-btn border-0 rounded-3 fw-semibold mt-3">
+          <SignButton
+            className="sign-btn border-0 rounded-3 fw-semibold mt-3"
+            type="submit"
+            onClick={handleSubmit}
+          >
             {onSignIn ? "Kyçu" : "Regjistrohu"}
           </SignButton>
         </form>

@@ -12,6 +12,7 @@ const Input = styled.input`
     box-shadow: none !important;
     background-color: var(--primary-bg);
     caret-color: var(--secondary-text);
+    color: var(--white);
   }
 
   &::placeholder {

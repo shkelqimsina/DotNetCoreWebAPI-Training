@@ -19,12 +19,12 @@ const AuthProvider = ({ children }) => {
   }, [token]);
 
   // LOGIN FUNCTION (Authenticates user and fetches user info)
-  const login = async (email, password) => {
+  const login = async (username, password) => {
     try {
       const response = await axios.post(
         "http://localhost:5050/api/account/login",
         {
-          email,
+          username,
           password,
         }
       );
@@ -52,8 +52,30 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // REGISTER FUNCTION
+  const register = async (username, emri, mbiemri, email, password) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5050/api/account/register",
+        {
+          username,
+          emri,
+          mbiemri,
+          email,
+          password,
+        }
+      );
+
+      console.log("Registration successful:", response.data);
+      return response.data; // Return data to handle in UI if needed
+    } catch (error) {
+      console.error("Registration failed:", error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

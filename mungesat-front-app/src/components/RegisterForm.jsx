@@ -16,8 +16,8 @@ function RegisterForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
-    fname: "",
-    lname: "",
+    emri: "",
+    mbiemri: "",
     email: "",
     password: "",
   });
@@ -28,7 +28,7 @@ function RegisterForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -68,16 +68,16 @@ function RegisterForm() {
           className="border-0 px-4 rounded-3 w-50"
           type="text"
           placeholder="First Name"
-          name="fname"
-          value={formData.fname}
+          name="emri"
+          value={formData.emri}
           onChange={handleChange}
         />
         <Input
           className="border-0 px-4 rounded-3 w-50"
           type="text"
           placeholder="Last Name"
-          name="lname"
-          value={formData.lname}
+          name="mbiemri"
+          value={formData.mbiemri}
           onChange={handleChange}
         />
       </div>
@@ -113,7 +113,7 @@ function RegisterForm() {
       <SignButton
         className="sign-btn border-0 rounded-3 fw-semibold mt-3"
         type="submit"
-        onClick={handleSubmit}
+        onClick={handleSubmitRegister}
       >
         Regjistrohu
       </SignButton>

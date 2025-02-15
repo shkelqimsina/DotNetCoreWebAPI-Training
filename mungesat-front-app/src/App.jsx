@@ -1,79 +1,37 @@
-// import { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-// function App() {
-//   const [klasa, setKlasa] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-// // Fetch data when the component mounts
-// useEffect(() => {
-//   // Replace this with your actual API endpoint
-//   axios.get('http://localhost:5050/api/Klasat') 
-//     .then(response => {
-//       setKlasa(response.data);  // Set the state with the fetched data
-//       setLoading(false);
-//     })
-//     .catch(err => {
-//       setError('Failed to load data', err);
-//       setLoading(false);
-//     });
-// }, []);
-
-// if (loading) return <p>Loading...</p>;
-// if (error) return <p>{error}</p>;
-
-// console.log(klasa);
-
-
-// return (
-//   <div>
-//     <h1>Klaset:</h1>
-//     <ul>
-//       {klasa.map(item => (
-//         <li key={item.id}>{item.name} - {item.role}</li>
-//       ))}
-//     </ul>
-//   </div>
-// );
-// };
-
-// export default App;
-
-
-import { useEffect, useState } from 'react';
-import fetchKlasat from './api';  // Import the fetchKlasat function
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+import SignForm from "./screens/SignForm";
+import Dashboard from "./screens/Dashboard";
+import Teacher from "./screens/Teacher";
+import TeacherAdd from "./screens/TeacherAdd";
+import Class from "./screens/Class";
+import ClassAdd from "./screens/ClassAdd";
+import Student from "./screens/Student";
+import StudentAdd from "./screens/StudentAdd";
+import Missings from "./screens/Missings";
+import Settings from "./screens/Settings";
 
 function App() {
-  const [klasa, setKlasa] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Fetch data when the component mounts
-  useEffect(() => {
-    fetchKlasat()
-      .then(data => {
-        setKlasa(data);  // Set the state with the fetched data
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);  // Set error message
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <div>
-      <h1>Klaset:</h1>
-      <ul>
-        {klasa.map(item => (
-          <li key={item.id}>{item.name} - {item.role}</li>
-        ))}
-      </ul>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<SignForm />} />
+        {/* <Route element={<PrivateRoute />}> */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/teacher" element={<Teacher />} />
+        <Route path="/teacher-add" element={<TeacherAdd />} />
+        <Route path="/class" element={<Class />} />
+        <Route path="/class-add" element={<ClassAdd />} />
+        <Route path="/student" element={<Student />} />
+        <Route path="/student-add" element={<StudentAdd />} />
+        <Route path="/missings" element={<Missings />} />
+        <Route path="/settings" element={<Settings />} />
+        {/* </Route> */}
+      </Routes>
+    </Router>
   );
 }
 

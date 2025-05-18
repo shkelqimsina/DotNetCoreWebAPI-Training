@@ -1,0 +1,73 @@
+.signForm {
+  width: 100%;
+  padding: 0 100px;
+}
+
+.sign-text {
+  margin-top: 15%;
+}
+
+.logo {
+  max-width: 150px;
+  width: 80%;
+}
+
+.sign-text h1 {
+  font-size: 3.2rem;
+}
+
+.register-here {
+  color: var(--primary-bg);
+  cursor: pointer;
+}
+
+.sign-form {
+  margin-top: 10%;
+}
+
+.eye {
+  color: var(--primary-text);
+  cursor: pointer;
+}
+
+.sign-form .sign-btn {
+  height: 60px;
+  background-color: var(--primary-bg);
+  color: var(--white);
+  box-shadow: 0px 0px 50px -10px var(--primary-bg);
+}
+
+.sign-form .forgot-p {
+  color: var(--secondary-text);
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+  .signForm {
+    padding: 0 60px;
+  }
+
+  .sign-form {
+    margin-top: 50px;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .signForm {
+    padding: 0 70px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .signForm {
+    padding: 0 20px;
+  }
+
+  .sign-text {
+    margin-top: 100px;
+  }
+
+  .sign-text h1 {
+    font-size: 2.7rem;
+  }
+}

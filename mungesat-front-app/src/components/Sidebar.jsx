@@ -65,7 +65,7 @@ function Sidebar() {
                 title="Cilësimet"
                 path="/settings"
               />
-              <SideItem icon={<BiLogOut />} title="Çkyqu" />
+              <SideItem icon={<BiLogOut />} title="Kyqu" path="/" />
             </div>
           </div>
         </>

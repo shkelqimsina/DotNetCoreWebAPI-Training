@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Data;
 using Mungesat_shkolla.Models;
 
@@ -22,12 +22,15 @@ namespace Mungesat_shkolla.Repositories
 
         public async Task<List<Klasat>> GetAsync()
         {
-            return await dbContext.Klasat.ToListAsync();
+            return await dbContext.Klasat.Include(k => k.Kujdestari).ToListAsync();
         }
 
         public async Task<Klasat> GetByIdAsync(int id)
         {
-            return await dbContext.Klasat.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            return await dbContext.Klasat
+                .Include(k => k.Kujdestari)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
        

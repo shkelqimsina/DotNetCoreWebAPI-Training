@@ -3,75 +3,52 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+// Përdorim URL relative që Vite t’i dërgojë te API (proxy)
+const api = axios.create({
+  baseURL: "/api",
+  headers: { "Content-Type": "application/json" },
+});
+
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
     if (token) {
-      axios
-        .get("http://localhost:5050/api/Kujdestaret", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => setUser(response.data))
-        .catch(() => logout());
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]) || "{}");
+        setUser({ userName: payload.given_name || payload.email, email: payload.email });
+      } catch {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
     }
   }, [token]);
 
-  // LOGIN FUNCTION (Authenticates user and fetches user info)
   const login = async (username, password) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5050/api/account/login",
-        {
-          username,
-          password,
-        }
-      );
-
-      localStorage.setItem("token", response.data.token);
-      setToken(response.data.token);
-
-      // Fetch user info after login
-      const userResponse = await axios.get(
-        "http://localhost:5050/api/Kujdestaret",
-        {
-          headers: { Authorization: `Bearer ${response.data.token}` },
-        }
-      );
-      setUser(userResponse.data);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+    const response = await api.post("/account/login", { username, password });
+    const { token: newToken, userName, email } = response.data;
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setUser({ userName: userName || username, email: email || "" });
   };
 
-  // LOGOUT FUNCTION (removes token and user)
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
 
-  // REGISTER FUNCTION
   const register = async (username, emri, mbiemri, email, password) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5050/api/account/register",
-        {
-          username,
-          emri,
-          mbiemri,
-          email,
-          password,
-        }
-      );
-
-      console.log("Registration successful:", response.data);
-      return response.data; // Return data to handle in UI if needed
-    } catch (error) {
-      console.error("Registration failed:", error);
-      throw error;
-    }
+    const response = await api.post("/account/register", {
+      username,
+      emri,
+      mbiemri,
+      email,
+      password,
+    });
+    return response.data;
   };
 
   return (

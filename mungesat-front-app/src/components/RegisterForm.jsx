@@ -34,20 +34,40 @@ function RegisterForm() {
     setError("");
 
     try {
-      const response = await fetch(
-        "http://localhost:5050/api/account/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("/api/account/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-      if (!response.ok) throw new Error("Registration failed");
+      const text = await response.text();
+      const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
+      if (!response.ok) {
+        const parts = [];
+        if (data.title) parts.push(data.title);
+        if (data.message) parts.push(data.message);
+        if (data.detail) parts.push(data.detail);
+        if (data.errors) {
+          if (Array.isArray(data.errors)) {
+            parts.push(data.errors.join(" "));
+          } else if (typeof data.errors === "object") {
+            const list = Object.entries(data.errors).flatMap(([key, val]) =>
+              (Array.isArray(val) ? val : [val]).map((m) => (key === "Email" ? "Email: duhet të jetë adresë e vlefshme (p.sh. emri@domain.com)." : `${key}: ${m}`))
+            );
+            parts.push(list.join(" "));
+          }
+        }
+        const msg = parts.length ? parts.join(" — ") : (text || "Regjistrimi dështoi.");
+        throw new Error(msg);
+      }
 
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      const msg = err.message || "";
+      if (msg.includes("fetch") || msg.includes("Network") || msg.includes("Failed"))
+        setError("Lidhja me serverin dështoi. Sigurohuni që API është i ndezur (http://localhost:5050).");
+      else
+        setError(msg || "Regjistrimi dështoi.");
     } finally {
       setLoading(false);
     }
@@ -110,12 +130,15 @@ function RegisterForm() {
           />
         )}
       </div>
+      <p className="text-muted small mb-0">Fjalëkalimi: të paktën 6 karaktere, shkronjë e madhe, e vogël, shifër dhe simbol (p.sh. !@#).</p>
+      {error && <div className="alert alert-danger py-2 mt-2 mb-0">{error}</div>}
       <SignButton
         className="sign-btn border-0 rounded-3 fw-semibold mt-3"
         type="submit"
+        disabled={loading}
         onClick={handleSubmitRegister}
       >
-        Regjistrohu
+        {loading ? "Duke u regjistruar…" : "Regjistrohu"}
       </SignButton>
     </>
   );

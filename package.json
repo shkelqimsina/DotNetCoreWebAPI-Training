@@ -1,0 +1,10 @@
+{
+  "name": "DotNetCoreWebAPI-Training",
+  "private": true,
+  "description": "Root project – use these scripts to run frontend from project root.",
+  "scripts": {
+    "dev": "npm run dev --prefix mungesat-front-app",
+    "front": "npm run dev --prefix mungesat-front-app",
+    "build": "npm run build --prefix mungesat-front-app"
+  }
+}

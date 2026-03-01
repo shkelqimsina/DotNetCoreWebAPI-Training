@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,8 +30,10 @@ namespace Mungesat_shkolla.Controllers
         [Authorize]
         public async Task<IActionResult> GetAll()
         {
-            var kujdestari = await dbContext.kujdestari.ToListAsync();
-            return Ok(kujdestari);
+            var list = await dbContext.kujdestari
+                .Select(k => new KujdestariListDto { Id = k.Id, Emri = k.Emri, Mbiemri = k.Mbiemri })
+                .ToListAsync();
+            return Ok(list);
         }
         [HttpGet]
         [Route("{id}")]
@@ -47,6 +49,11 @@ namespace Mungesat_shkolla.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] KujdestariDto kujdestaridto)
         {
             var kujdestar = mapper.Map<Kujdestari>(kujdestaridto);
+            // Identity kërkon UserName; përdorim email si emër përdoruesi
+            kujdestar.UserName = kujdestaridto.Email?.Trim().ToLowerInvariant() ?? kujdestaridto.Email;
+            kujdestar.NormalizedUserName = kujdestar.UserName?.ToUpperInvariant();
+            kujdestar.NormalizedEmail = kujdestar.Email?.ToUpperInvariant();
+            kujdestar.SecurityStamp = Guid.NewGuid().ToString();
             await kujdestariRepository.CreateAsync(kujdestar);
             var kujda = mapper.Map<KujdestariDto>(kujdestar);
 

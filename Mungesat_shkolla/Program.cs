@@ -29,8 +29,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAutoMapper(typeof(Profiles));
 
-// Configure Identity
-builder.Services.AddIdentity<Kujdestari, IdentityRole>()
+// Configure Identity (int Id to match database)
+builder.Services.AddIdentity<Kujdestari, IdentityRole<int>>()
     .AddEntityFrameworkStores<MungesatDbContext>()
     .AddDefaultTokenProviders();
 
@@ -61,7 +61,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")  // React app origin (URL)
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5179", "http://localhost:5181")  // React/Vite dev
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -79,8 +79,8 @@ if (app.Environment.IsDevelopment())
 // Use CORS
 app.UseCors("AllowReactApp");
 
-
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+  app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

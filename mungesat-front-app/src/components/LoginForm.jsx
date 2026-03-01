@@ -35,19 +35,11 @@ function LoginForm() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5050/api/account/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) throw new Error("Invalid credentials");
-
-      const data = await response.json();
-      login(data.token);
+      await login(formData.username, formData.password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      const msg = err.response?.data?.message ?? err.response?.data ?? err.message ?? "Kredencialet janë të gabuara.";
+      setError(typeof msg === "string" ? msg : "Kredencialet janë të gabuara.");
     } finally {
       setLoading(false);
     }
@@ -87,12 +79,14 @@ function LoginForm() {
       <a className="forgot-p text-end text-decoration-none">
         Keni harruar fjalëkalimin?
       </a>
+      {error && <div className="alert alert-danger py-2 mb-0">{error}</div>}
       <SignButton
         className="sign-btn border-0 rounded-3 fw-semibold mt-3"
         type="submit"
+        disabled={loading}
         onClick={handleSubmitLogin}
       >
-        Kyqu
+        {loading ? "Duke u kyçur…" : "Kyqu"}
       </SignButton>
     </>
   );

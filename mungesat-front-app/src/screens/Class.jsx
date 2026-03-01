@@ -1,24 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import SearchForm from "../components/SearchForm";
+import axios from "../axiosInstance";
 
 function Class() {
   const navigate = useNavigate();
+  const [klasat, setKlasat] = useState([]);
 
-  const handleBackClick = () => {
+  const handleAddClick = () => {
     navigate("/class-add");
   };
+
+  useEffect(() => {
+    axios
+      .get("/Klasat")
+      .then((res) => setKlasat(res.data || []))
+      .catch(() => setKlasat([]));
+  }, []);
 
   return (
     <div className="teacher h-100 w-100 d-flex">
       <Sidebar />
       <div className="w-100 p-5">
-        <div className="w-100 d-flex justify-content-between">
+        <div className="w-100 d-flex justify-content-between align-items-center">
           <h1>Klasët</h1>
-          <AddButton onClick={handleBackClick}>Shto Klasë</AddButton>
+          <AddButton onClick={handleAddClick} type="button">Shto Klasë</AddButton>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown
@@ -29,11 +38,27 @@ function Class() {
           />
           <SearchForm />
         </div>
-        <div className="h-75 mt-4 d-flex flex-column justify-content-center align-items-center">
-          <h2>Nuk ka asnjë Klasë!</h2>
-          <p className="text-secondary">
-            Klasët shfaqen atëherë kur janë shtuar.
-          </p>
+        <div className="h-75 mt-4">
+          {klasat.length === 0 ? (
+            <div className="d-flex flex-column justify-content-center align-items-center h-100">
+              <h2>Nuk ka asnjë klasë</h2>
+              <p className="text-secondary mb-4">Klasët shfaqen këtu pasi t'i shtoni.</p>
+              <AddButton onClick={handleAddClick} type="button">Shto klasë të parë</AddButton>
+            </div>
+          ) : (
+            <ul className="list-group">
+              {klasat.map((klasa) => (
+                <li key={klasa.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  <span>
+                    <strong>Klasa {klasa.emri}</strong>
+                    <span className="text-muted ms-2">
+                      – Kujdestari: {[klasa.emriKujdestari, klasa.mbiemriKujdestari].filter(Boolean).join(" ") || "—"}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

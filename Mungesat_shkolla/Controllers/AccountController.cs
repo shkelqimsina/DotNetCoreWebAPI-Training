@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -56,13 +56,13 @@ public class AccountController : ControllerBase
 
       var appUser = new Kujdestari
       {
-        UserName = registerDto.Username,
-        Emri = registerDto.Emri,
-        Mbiemri = registerDto.Mbiemri,
-        Email = registerDto.Email,
+        UserName = registerDto.Username?.Trim().ToLowerInvariant() ?? "",
+        Emri = registerDto.Emri ?? "",
+        Mbiemri = registerDto.Mbiemri ?? "",
+        Email = registerDto.Email ?? "",
       };
 
-      var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+      var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password ?? "");
 
       if (createdUser.Succeeded)
       {
@@ -77,12 +77,14 @@ public class AccountController : ControllerBase
       }
       else
       {
-        return StatusCode(500, "An error occurred while creating the user.");
+        var errors = createdUser.Errors.Select(e => e.Description).ToList();
+        return BadRequest(new { message = "Gabim gjatë krijimit të përdoruesit.", errors });
       }
     }
-    catch (Exception e)
+    catch (Exception ex)
     {
-      return StatusCode(500, "An internal error occurred.");
+      var msg = ex.InnerException?.Message ?? ex.Message;
+      return StatusCode(500, new { message = "Gabim i brendshëm. Provoni përsëri.", detail = msg });
     }
   }
 }

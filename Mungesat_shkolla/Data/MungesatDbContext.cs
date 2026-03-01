@@ -1,37 +1,52 @@
-﻿using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Models;
 
 namespace Mungesat_shkolla.Data
 {
-    public class MungesatDbContext : IdentityDbContext<Kujdestari>
-
-  {
-    public MungesatDbContext(DbContextOptions options) : base(options)
+    public class MungesatDbContext : IdentityDbContext<Kujdestari, IdentityRole<int>, int>
+    {
+        public MungesatDbContext(DbContextOptions options) : base(options)
         {
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
 
-      modelBuilder.Entity<IdentityUserRole<string>>()
-          .HasKey(p => new { p.UserId, p.RoleId });
+            // Detyrojmë emrat e tabelave Identity të përputhen me DB (tabela është Kujdestari, jo AspNetUsers)
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (entityType.ClrType == typeof(Kujdestari))
+                    entityType.SetTableName("Kujdestari");
+                else if (entityType.ClrType == typeof(IdentityRole<int>))
+                    entityType.SetTableName("Roles");
+                else if (entityType.ClrType == typeof(IdentityUserRole<int>))
+                    entityType.SetTableName("UserRoles");
+                else if (entityType.ClrType == typeof(IdentityUserClaim<int>))
+                    entityType.SetTableName("UserClaims");
+                else if (entityType.ClrType == typeof(IdentityUserLogin<int>))
+                    entityType.SetTableName("UserLogins");
+                else if (entityType.ClrType == typeof(IdentityRoleClaim<int>))
+                    entityType.SetTableName("RoleClaims");
+                else if (entityType.ClrType == typeof(IdentityUserToken<int>))
+                    entityType.SetTableName("UserTokens");
+            }
 
-      modelBuilder.Entity<IdentityUserLogin<string>>()
-          .HasKey(p => new { p.LoginProvider, p.ProviderKey });
-
-      modelBuilder.Entity<IdentityUserToken<string>>()
-          .HasKey(p => new { p.UserId, p.LoginProvider, p.Name });
-
+            modelBuilder.Entity<Klasat>()
+                .HasOne(k => k.Kujdestari)
+                .WithOne(kj => kj.Klasat)
+                .HasForeignKey<Klasat>(k => k.KujdestariId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
-    public DbSet<Klasat> Klasat { get; set; }
+        public DbSet<Klasat> Klasat { get; set; }
         public DbSet<KlasaLenda> klasaLenda { get; set; }
         public DbSet<Kujdestari> kujdestari { get; set; }
         public DbSet<Lenda> lenda { get; set; }
         public DbSet<Mungesa> mungesa { get; set; }
         public DbSet<Nxenesi> nxenesi { get; set; }
-
     }
 }

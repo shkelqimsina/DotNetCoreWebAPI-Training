@@ -56,7 +56,7 @@ function SignForm() {
           {onSignIn ? "Kyqu" : "Regjistrohu"}
         </h2>
         <form
-          // onSubmit={onSignIn ? handleSubmitLogin : handleSubmitRegister}
+          onSubmit={(e) => e.preventDefault()}
           className="w-100 w-lg-75 d-flex flex-column gap-4"
         >
           {onSignIn ? <LoginForm /> : <RegisterForm />}

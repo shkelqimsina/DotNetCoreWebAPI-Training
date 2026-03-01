@@ -45,20 +45,28 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpPost]
-
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CreateAsync([FromBody] KujdestariDto kujdestaridto)
         {
             var kujdestar = mapper.Map<Kujdestari>(kujdestaridto);
-            // Identity kërkon UserName; përdorim email si emër përdoruesi
             kujdestar.UserName = kujdestaridto.Email?.Trim().ToLowerInvariant() ?? kujdestaridto.Email;
             kujdestar.NormalizedUserName = kujdestar.UserName?.ToUpperInvariant();
             kujdestar.NormalizedEmail = kujdestar.Email?.ToUpperInvariant();
             kujdestar.SecurityStamp = Guid.NewGuid().ToString();
             await kujdestariRepository.CreateAsync(kujdestar);
+
+            if (kujdestaridto.KlasatId.HasValue && kujdestaridto.KlasatId.Value > 0)
+            {
+                var klasa = await dbContext.Klasat.FindAsync(kujdestaridto.KlasatId.Value);
+                if (klasa != null)
+                {
+                    klasa.KujdestariId = kujdestar.Id;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+
             var kujda = mapper.Map<KujdestariDto>(kujdestar);
-
             return Ok(kujda);
-
         }
 
         [HttpPut]

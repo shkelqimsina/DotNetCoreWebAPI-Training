@@ -1,5 +1,5 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Data;
@@ -25,6 +25,7 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAsync()
         {
             var klasat = await klasatRepository.GetAsync();
@@ -42,6 +43,7 @@ namespace Mungesat_shkolla.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             var klasa = await klasatRepository.GetByIdAsync(id);
@@ -58,6 +60,7 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CreateAsync([FromBody] KlasatDto klasatDto)
         {
             var kl = mapper.Map<Klasat>(klasatDto);
@@ -75,6 +78,7 @@ namespace Mungesat_shkolla.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] KlasatDto klasatDto)
         {
             var existing = await klasatRepository.GetByIdAsync(id);
@@ -97,6 +101,7 @@ namespace Mungesat_shkolla.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int id)
         {
             var klasa = await klasatRepository.GetByIdAsync(id);

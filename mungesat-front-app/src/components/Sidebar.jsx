@@ -6,7 +6,6 @@ import { GoSidebarCollapse } from "react-icons/go";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { PiStudentBold } from "react-icons/pi";
-import { FaUser } from "react-icons/fa";
 import { TbSettings } from "react-icons/tb";
 import { BiLogOut } from "react-icons/bi";
 import { MdErrorOutline } from "react-icons/md";

@@ -40,7 +40,7 @@ function Teacher() {
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between">
           <h1>Kujdestarët</h1>
-          <AddButton onClick={handleAddClick}>Shto Kujdestarë</AddButton>
+          <AddButton onClick={handleAddClick} type="button">Shto Kujdestarë</AddButton>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown

@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import SearchForm from "../components/SearchForm";
 import axios from "../axiosInstance";
+import { AuthContext } from "../context/AuthContext";
 
 function Class() {
   const navigate = useNavigate();
+  const { isAdministrator } = useContext(AuthContext);
   const [klasat, setKlasat] = useState([]);
 
   const handleAddClick = () => {
@@ -27,7 +29,9 @@ function Class() {
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between align-items-center">
           <h1>Klasët</h1>
-          <AddButton onClick={handleAddClick} type="button">Shto Klasë</AddButton>
+          {isAdministrator && (
+            <AddButton onClick={handleAddClick} type="button">Shto Klasë</AddButton>
+          )}
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown
@@ -43,7 +47,9 @@ function Class() {
             <div className="d-flex flex-column justify-content-center align-items-center h-100">
               <h2>Nuk ka asnjë klasë</h2>
               <p className="text-secondary mb-4">Klasët shfaqen këtu pasi t'i shtoni.</p>
-              <AddButton onClick={handleAddClick} type="button">Shto klasë të parë</AddButton>
+              {isAdministrator && (
+                <AddButton onClick={handleAddClick} type="button">Shto klasë të parë</AddButton>
+              )}
             </div>
           ) : (
             <ul className="list-group">

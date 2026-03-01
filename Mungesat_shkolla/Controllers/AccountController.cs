@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Models;
@@ -13,11 +12,18 @@ namespace api.Controllers;
 public class AccountController : ControllerBase
 {
   private readonly UserManager<Kujdestari> _userManager;
+  private readonly RoleManager<IdentityRole<int>> _roleManager;
   private readonly ITokenService _tokenService;
   private readonly SignInManager<Kujdestari> _signinManager;
-  public AccountController(UserManager<Kujdestari> userManager, ITokenService tokenService, SignInManager<Kujdestari> signInManager)
+
+  public AccountController(
+    UserManager<Kujdestari> userManager,
+    RoleManager<IdentityRole<int>> roleManager,
+    ITokenService tokenService,
+    SignInManager<Kujdestari> signInManager)
   {
     _userManager = userManager;
+    _roleManager = roleManager;
     _tokenService = tokenService;
     _signinManager = signInManager;
   }
@@ -29,21 +35,21 @@ public class AccountController : ControllerBase
       return BadRequest(ModelState);
 
     var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
-
     if (user == null) return Unauthorized("Invalid username!");
 
     var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
     if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
 
-    return Ok(
-        new NewUserDto
-        {
-          UserName = user.UserName,
-          Email = user.Email,
-          Token = _tokenService.CreateToken(user)
-        }
-    );
+    var roles = await _userManager.GetRolesAsync(user);
+    var role = roles.FirstOrDefault() ?? "";
+
+    return Ok(new NewUserDto
+    {
+      UserName = user.UserName,
+      Email = user.Email ?? "",
+      Token = await _tokenService.CreateTokenAsync(user),
+      Role = role
+    });
   }
 
   [HttpPost("register")]
@@ -66,14 +72,20 @@ public class AccountController : ControllerBase
 
       if (createdUser.Succeeded)
       {
-          return Ok(
-              new NewUserDto
-              {
-                UserName = appUser.UserName,
-                Email = appUser.Email,
-                Token = _tokenService.CreateToken(appUser)
-              }
-          );
+        var isFirstUser = await _userManager.Users.CountAsync() == 1;
+        var roleName = isFirstUser ? "Administrator" : "Kujdestar";
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if (!roleExists)
+          await _roleManager.CreateAsync(new IdentityRole<int>(roleName));
+        await _userManager.AddToRoleAsync(appUser, roleName);
+
+        return Ok(new NewUserDto
+        {
+          UserName = appUser.UserName,
+          Email = appUser.Email ?? "",
+          Token = await _tokenService.CreateTokenAsync(appUser),
+          Role = roleName
+        });
       }
       else
       {

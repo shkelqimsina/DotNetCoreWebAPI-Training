@@ -69,6 +69,17 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Seed roles (Administrator, Kujdestar) nëse nuk ekzistojnë
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    foreach (var roleName in new[] { "Administrator", "Kujdestar" })
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+            await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
@@ -11,8 +11,14 @@ function TeacherAdd() {
   const [emri, setEmri] = useState("");
   const [mbiemri, setMbiemri] = useState("");
   const [email, setEmail] = useState("");
+  const [klasatId, setKlasatId] = useState("");
+  const [klasat, setKlasat] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    axios.get("/Klasat").then((res) => setKlasat(Array.isArray(res.data) ? res.data : [])).catch(() => setKlasat([]));
+  }, []);
 
   const handleBackClick = () => {
     navigate("/teacher");
@@ -23,14 +29,18 @@ function TeacherAdd() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("/Kujdestaret", { emri, mbiemri, email });
+      const body = { emri, mbiemri, email };
+      if (klasatId) body.klasatId = parseInt(klasatId, 10);
+      await axios.post("/Kujdestaret", body);
       navigate("/teacher");
     } catch (err) {
-      const msg =
+      let msg =
         err.response?.data?.message ||
         (typeof err.response?.data === "string" ? err.response.data : null) ||
         err.message ||
         "Shtimi i kujdestarit dështoi.";
+      if (err.response?.status === 403)
+        msg = "Vetëm administratori mund të shtojë kujdestarë. Dil dhe kyçu me një llogari administratori.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -75,6 +85,19 @@ function TeacherAdd() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            <label className="form-label text-secondary mb-0">Klasa (ku është kujdestar)</label>
+            <select
+              className="form-select border-0 px-4 rounded-3 py-2"
+              value={klasatId}
+              onChange={(e) => setKlasatId(e.target.value)}
+            >
+              <option value="">Pa klasë / zgjidhni më vonë</option>
+              {klasat.map((k) => (
+                <option key={k.id ?? k.Id} value={k.id ?? k.Id}>
+                  {k.emri ?? k.Emri ?? ""}
+                </option>
+              ))}
+            </select>
             <SignButton
               type="submit"
               className="sign-btn border-0 rounded-3 fw-semibold mt-3"

@@ -22,7 +22,10 @@ namespace Mungesat_shkolla.Data
                 if (entityType.ClrType == typeof(Kujdestari))
                     entityType.SetTableName("Kujdestari");
                 else if (entityType.ClrType == typeof(IdentityRole<int>))
+                {
                     entityType.SetTableName("Roles");
+                    entityType.FindProperty("Id")?.SetValueGenerationStrategy(Microsoft.EntityFrameworkCore.Metadata.SqlServerValueGenerationStrategy.IdentityColumn);
+                }
                 else if (entityType.ClrType == typeof(IdentityUserRole<int>))
                     entityType.SetTableName("UserRoles");
                 else if (entityType.ClrType == typeof(IdentityUserClaim<int>))

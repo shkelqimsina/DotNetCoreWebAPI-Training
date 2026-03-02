@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SideItem from "./SideItem";
 import eMungesat from "../assets/logos/eMungesat.png";
+import "../styles/screens/dashboard.css";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { GoSidebarCollapse } from "react-icons/go";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
@@ -37,7 +38,7 @@ function Sidebar() {
               <SideItem
                 icon={<TbLayoutDashboardFilled />}
                 title="Paneli i kryesor"
-                path="/dashboard"
+                path="/"
               />
               <SideItem
                 icon={<FaChalkboardTeacher />}

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import SignForm from "./screens/SignForm";
-import Dashboard from "./screens/Dashboard";
 import Teacher from "./screens/Teacher";
 import TeacherAdd from "./screens/TeacherAdd";
+import TeacherEdit from "./screens/TeacherEdit";
 import Class from "./screens/Class";
 import ClassAdd from "./screens/ClassAdd";
 import Student from "./screens/Student";
@@ -20,10 +20,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<SignForm />} />
+        <Route path="/dashboard" element={<SignForm />} />
         {/* <Route element={<PrivateRoute />}> */}
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/teacher" element={<Teacher />} />
         <Route path="/teacher-add" element={<TeacherAdd />} />
+        <Route path="/teacher-edit/:id" element={<TeacherEdit />} />
         <Route path="/class" element={<Class />} />
         <Route path="/class-add" element={<ClassAdd />} />
         <Route path="/student" element={<Student />} />

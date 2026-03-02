@@ -40,3 +40,5 @@ DBCC CHECKIDENT ('[dbo].[Kujdestari]', RESEED, 0);
 
 PRINT 'E gatshme. Të gjitha të dhënat janë fshirë – fillon nga zero. Regjistrohuni si i pari për të qenë Administrator.';
 GO
+   USE eMungesatDb;
+   SELECT Id, UserName, Emri, Mbiemri, Email FROM [dbo].[Kujdestari];

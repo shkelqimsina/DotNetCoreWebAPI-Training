@@ -36,9 +36,13 @@ function LoginForm() {
 
     try {
       await login(formData.username, formData.password);
-      navigate("/dashboard");
+      navigate("/teacher");
     } catch (err) {
-      const msg = err.response?.data?.message ?? err.response?.data ?? err.message ?? "Kredencialet janë të gabuara.";
+      const data = err.response?.data;
+      const msg =
+        (typeof data === "string" ? data : data?.message) ||
+        err.message ||
+        "Emri i përdoruesit ose fjalëkalimi janë gabim. Provoni përsëri.";
       setError(typeof msg === "string" ? msg : "Kredencialet janë të gabuara.");
     } finally {
       setLoading(false);

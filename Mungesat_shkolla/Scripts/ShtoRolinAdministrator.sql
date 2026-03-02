@@ -11,7 +11,7 @@
 USE eMungesatDb;
 GO
 
-DECLARE @UserName NVARCHAR(256) = N'adilj';  -- <-- Ndryshoje: username OSE email
+DECLARE @UserName NVARCHAR(256) = N'ilmib';  -- <-- Ndryshoje: username OSE email i llogarisë së parë
 DECLARE @UserId INT;
 DECLARE @AdminRoleId INT;
 

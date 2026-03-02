@@ -34,11 +34,17 @@ public class AccountController : ControllerBase
     if (!ModelState.IsValid)
       return BadRequest(ModelState);
 
-    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
-    if (user == null) return Unauthorized("Invalid username!");
+    var username = loginDto.Username?.Trim();
+    if (string.IsNullOrEmpty(username))
+      return BadRequest(new { message = "Shkruani emrin e përdoruesit." });
 
-    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-    if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
+    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username.ToLowerInvariant());
+    if (user == null)
+      return Unauthorized(new { message = "Përdoruesi me këtë emër nuk u gjet. Kontrolloni emrin ose regjistrohuni." });
+
+    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password ?? "", false);
+    if (!result.Succeeded)
+      return Unauthorized(new { message = "Fjalëkalimi është i gabuar. Provoni përsëri." });
 
     var roles = await _userManager.GetRolesAsync(user);
     var role = roles.FirstOrDefault() ?? "";
@@ -68,16 +74,22 @@ public class AccountController : ControllerBase
         Email = registerDto.Email ?? "",
       };
 
+      // Përcaktojmë rolin PARA krijimit: nëse nuk ka asnjë përdorues, ky do të jetë Administrator
+      var numriPerdoruesvePara = await _userManager.Users.CountAsync();
+      var doJeteAdministrator = (numriPerdoruesvePara == 0);
+
       var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password ?? "");
 
       if (createdUser.Succeeded)
       {
-        var isFirstUser = await _userManager.Users.CountAsync() == 1;
-        var roleName = isFirstUser ? "Administrator" : "Kujdestar";
+        var roleName = doJeteAdministrator ? "Administrator" : "Kujdestar";
         var roleExists = await _roleManager.RoleExistsAsync(roleName);
         if (!roleExists)
           await _roleManager.CreateAsync(new IdentityRole<int>(roleName));
-        await _userManager.AddToRoleAsync(appUser, roleName);
+
+        var roleResult = await _userManager.AddToRoleAsync(appUser, roleName);
+        if (!roleResult.Succeeded)
+          return StatusCode(500, new { message = "Përdoruesi u krijua por roli nuk u caktua.", errors = roleResult.Errors.Select(e => e.Description).ToList() });
 
         return Ok(new NewUserDto
         {

@@ -63,7 +63,7 @@ function TeacherEdit() {
         "Ndryshimet nuk u ruajtën.";
       if (status === 403)
         msg =
-          "Vetëm administratori mund të ndryshojë kujdestarët. Dil dhe kyçu me një llogari administratori.";
+          "Nuk u njohët si administrator. Dil dhe kyçu përsëri me llogarinë administrator (adilj) që tokeni të përditësohet.";
       setError(msg);
     } finally {
       setLoading(false);

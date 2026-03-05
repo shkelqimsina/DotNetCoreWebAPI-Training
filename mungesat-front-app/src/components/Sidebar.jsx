@@ -56,7 +56,7 @@ function Sidebar() {
                 </div>
                 <div className="small text-white text-opacity-85">
                   Roli: <strong>{me?.role ?? (role || (me ? "—" : "..."))}</strong>
-                  {(me?.isAdministrator ?? role === "Administrator") && " ✓"}
+                  {((me?.isAdministrator ?? role === "Administrator") || (me?.isKujdestar ?? role === "Kujdestar")) && " ✓"}
                 </div>
               </div>
             )}

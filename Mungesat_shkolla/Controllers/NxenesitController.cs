@@ -28,8 +28,8 @@ namespace Mungesat_shkolla.Controllers
 
         private int? GetCurrentUserId()
         {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(sub, out var id) ? id : null;
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            return sub != null && int.TryParse(sub, out var id) ? id : null;
         }
 
         private async Task<int?> GetKujdestarKlasatIdAsync()
@@ -99,6 +99,9 @@ namespace Mungesat_shkolla.Controllers
             var klasatId = await GetKujdestarKlasatIdAsync();
             if (!User.IsInRole("Administrator") && (!klasatId.HasValue || nxenesiDomain.KlasatId != klasatId.Value))
                 return Forbid();
+
+            if (!User.IsInRole("Administrator") && nxenesitDto.KlasatId != klasatId.Value)
+                return BadRequest("Kujdestari mund të ndryshojë vetëm nxënësit e klasës së vet; nuk mund t’ia ndryshoni klasën.");
 
             nxenesiDomain = mapper.Map<Nxenesi>(nxenesitDto);
             nxenesiDomain.Id = id;

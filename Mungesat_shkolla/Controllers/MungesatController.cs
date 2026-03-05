@@ -25,8 +25,8 @@ namespace Mungesat_shkolla.Controllers
 
         private int? GetCurrentUserId()
         {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(sub, out var id) ? id : null;
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            return sub != null && int.TryParse(sub, out var id) ? id : null;
         }
 
         private async Task<int?> GetKujdestarKlasatIdAsync()

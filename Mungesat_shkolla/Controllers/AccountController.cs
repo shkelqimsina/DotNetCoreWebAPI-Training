@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Mungesat_shkolla.Data;
 using Mungesat_shkolla.Models;
 using Mungesat_shkolla.Interfaces;
 using Mungesat_shkolla.DTO;
@@ -17,17 +18,20 @@ public class AccountController : ControllerBase
   private readonly RoleManager<IdentityRole<int>> _roleManager;
   private readonly ITokenService _tokenService;
   private readonly SignInManager<Kujdestari> _signinManager;
+  private readonly MungesatDbContext _dbContext;
 
   public AccountController(
     UserManager<Kujdestari> userManager,
     RoleManager<IdentityRole<int>> roleManager,
     ITokenService tokenService,
-    SignInManager<Kujdestari> signInManager)
+    SignInManager<Kujdestari> signInManager,
+    MungesatDbContext dbContext)
   {
     _userManager = userManager;
     _roleManager = roleManager;
     _tokenService = tokenService;
     _signinManager = signInManager;
+    _dbContext = dbContext;
   }
 
   [HttpGet("me")]
@@ -45,13 +49,21 @@ public class AccountController : ControllerBase
     var roles = await _userManager.GetRolesAsync(user);
     var role = roles.FirstOrDefault() ?? "";
 
+    int? klasatId = null;
+    if (User.IsInRole("Kujdestar"))
+    {
+      var klasa = await _dbContext.Klasat.AsNoTracking().FirstOrDefaultAsync(k => k.KujdestariId == userId);
+      klasatId = klasa?.Id;
+    }
+
     return Ok(new
     {
       userName = user.UserName,
       email = user.Email,
       role,
       isAdministrator = User.IsInRole("Administrator"),
-      isKujdestar = User.IsInRole("Kujdestar")
+      isKujdestar = User.IsInRole("Kujdestar"),
+      klasatId
     });
   }
 
@@ -137,5 +149,27 @@ public class AccountController : ControllerBase
       var msg = ex.InnerException?.Message ?? ex.Message;
       return StatusCode(500, new { message = "Gabim i brendshëm. Provoni përsëri.", detail = msg });
     }
+  }
+
+  /// <summary>Vetëm administratori mund të rivendosë fjalëkalimin e një përdoruesi (p.sh. kur kujdestari e ka harruar).</summary>
+  [HttpPost("reset-password")]
+  [Authorize(Roles = "Administrator")]
+  public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+  {
+    if (string.IsNullOrWhiteSpace(dto.UserName))
+      return BadRequest(new { message = "Shkruani emrin e përdoruesit (username)." });
+    if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+      return BadRequest(new { message = "Fjalëkalimi i ri duhet të përmbajë të paktën 6 karaktere." });
+
+    var user = await _userManager.FindByNameAsync(dto.UserName.Trim().ToLowerInvariant());
+    if (user == null)
+      return NotFound(new { message = "Përdoruesi me këtë emër nuk u gjet." });
+
+    await _userManager.RemovePasswordAsync(user);
+    var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+    if (!result.Succeeded)
+      return BadRequest(new { message = "Fjalëkalimi nuk u ndryshua.", errors = result.Errors.Select(e => e.Description).ToList() });
+
+    return Ok(new { message = "Fjalëkalimi u ndryshua. Përdoruesi mund të kyçet me fjalëkalimin e ri." });
   }
 }

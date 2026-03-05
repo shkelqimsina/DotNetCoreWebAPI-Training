@@ -10,6 +10,7 @@ import Class from "./screens/Class";
 import ClassAdd from "./screens/ClassAdd";
 import Student from "./screens/Student";
 import StudentAdd from "./screens/StudentAdd";
+import StudentEdit from "./screens/StudentEdit";
 import Missings from "./screens/Missings";
 import MissingAdd from "./screens/MissingAdd";
 import Settings from "./screens/Settings";
@@ -29,6 +30,7 @@ function App() {
         <Route path="/class-add" element={<ClassAdd />} />
         <Route path="/student" element={<Student />} />
         <Route path="/student-add" element={<StudentAdd />} />
+        <Route path="/student-edit/:id" element={<StudentEdit />} />
         <Route path="/missings" element={<Missings />} />
         <Route path="/missings-add" element={<MissingAdd />} />
         <Route path="/settings" element={<Settings />} />

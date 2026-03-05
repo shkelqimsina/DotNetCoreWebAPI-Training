@@ -34,7 +34,7 @@ builder.Services.AddIdentity<Kujdestari, IdentityRole<int>>()
     .AddEntityFrameworkStores<MungesatDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure JWT authentication
+// Configure JWT authentication – përdorim "role" që tokeni e dërgon me këtë emër (për Administrator dhe Kujdestar)
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT:SigningKey"]);
 builder.Services.AddAuthentication(options =>
 {
@@ -43,6 +43,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+  options.MapInboundClaims = false;
   options.TokenValidationParameters = new TokenValidationParameters
   {
     ValidateIssuer = true,
@@ -52,7 +53,7 @@ builder.Services.AddAuthentication(options =>
     ValidIssuer = builder.Configuration["JWT:Issuer"],
     ValidAudience = builder.Configuration["JWT:Audience"],
     IssuerSigningKey = new SymmetricSecurityKey(key),
-    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+    RoleClaimType = "role"
   };
 });
 

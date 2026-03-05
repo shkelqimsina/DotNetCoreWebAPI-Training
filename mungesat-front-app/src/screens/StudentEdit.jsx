@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Input from "../components/Input";
@@ -7,7 +7,8 @@ import { GenderDropdown } from "../components/Dropdown";
 import { SignButton } from "../components/Button";
 import axios from "../axiosInstance";
 
-function StudentAdd() {
+function StudentEdit() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [emri, setEmri] = useState("");
   const [mbiemri, setMbiemri] = useState("");
@@ -19,29 +20,45 @@ function StudentAdd() {
   const [klasat, setKlasat] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadDone, setLoadDone] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
     const load = async () => {
-      const [klasaRes, meRes] = await Promise.all([
-        axios.get("/Klasat").catch(() => ({ data: [] })),
-        axios.get("/account/me").catch(() => ({ data: {} })),
-      ]);
-      const allKlasat = Array.isArray(klasaRes.data) ? klasaRes.data : [];
-      const me = meRes.data || {};
-      const myKlasatId = me.klasatId ?? me.KlasatId;
-      if (myKlasatId != null && (me.isKujdestar || me.role === "Kujdestar")) {
-        setKlasat(allKlasat.filter((k) => (k.id ?? k.Id) === myKlasatId));
-        setKlasatId(String(myKlasatId));
-      } else {
-        setKlasat(allKlasat);
+      try {
+        const [nxRes, klasaRes, meRes] = await Promise.all([
+          axios.get(`/Nxenesit/${id}`),
+          axios.get("/Klasat"),
+          axios.get("/account/me").catch(() => ({ data: {} })),
+        ]);
+        const d = nxRes.data;
+        setEmri(d.emri ?? d.Emri ?? "");
+        setMbiemri(d.mbiemri ?? d.Mbiemri ?? "");
+        setPrindi(d.prindi ?? d.Prindi ?? "");
+        setAdresa(d.adresa ?? d.Adresa ?? "");
+        setGjinia(d.gjinia ?? d.Gjinia ?? "");
+        const dl = d.ditelindja ?? d.Ditelindja;
+        setDitelindja(dl ? new Date(dl).toISOString().slice(0, 10) : "");
+        const kid = d.klasatId ?? d.KlasatId;
+        setKlasatId(kid != null ? String(kid) : "");
+        const allKlasat = Array.isArray(klasaRes.data) ? klasaRes.data : [];
+        const me = meRes.data || {};
+        const myKlasatId = me.klasatId ?? me.KlasatId;
+        if (myKlasatId != null && (me.isKujdestar || me.role === "Kujdestar")) {
+          setKlasat(allKlasat.filter((k) => (k.id ?? k.Id) === myKlasatId));
+        } else {
+          setKlasat(allKlasat);
+        }
+      } catch {
+        setError("Nxënësi nuk u gjet ose nuk keni të drejtë.");
+      } finally {
+        setLoadDone(true);
       }
     };
     load();
-  }, []);
+  }, [id]);
 
-  const handleBackClick = () => {
-    navigate("/student");
-  };
+  const handleBackClick = () => navigate("/student");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +69,7 @@ function StudentAdd() {
     }
     setLoading(true);
     try {
-      await axios.post("/Nxenesit", {
+      await axios.put(`/Nxenesit/${id}`, {
         emri: emri.trim(),
         mbiemri: mbiemri.trim(),
         ditelindja: ditelindja || "2000-01-01",
@@ -63,33 +80,41 @@ function StudentAdd() {
       });
       navigate("/student");
     } catch (err) {
-      let msg =
+      const msg =
         err.response?.data?.message ||
         (typeof err.response?.data === "string" ? err.response.data : null) ||
         err.message ||
-        "Shtimi i nxënësit dështoi.";
-      if (err.response?.status === 403)
-        msg =
-          "Nuk keni të drejtë të shtoni nxënës. Vetëm kujdestari i klasës ose administratori mund të shtojë nxënës. Sigurohuni që keni kyçur me llogarinë e duhur.";
-      setError(msg);
+        "Ndryshimet nuk u ruajtën.";
+      setError(err.response?.status === 403 ? "Mund të ndryshoni vetëm nxënësit e klasës tuaj." : msg);
     } finally {
       setLoading(false);
     }
   };
+
+  if (!loadDone && !error) {
+    return (
+      <div className="teacher h-100 w-100 d-flex">
+        <Sidebar />
+        <div className="w-100 p-5">
+          <div className="mt-4 text-secondary">Duke ngarkuar…</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="teacher h-100 w-100 d-flex">
       <Sidebar />
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between">
-          <h1>Nxënësit</h1>
+          <h1>Ndrysho nxënësin</h1>
           <AddButton onClick={handleBackClick} type="button">
             Kthehu
           </AddButton>
         </div>
         <div className="h-75 mt-5 mx-5 d-flex flex-column align-items-center">
           <form onSubmit={handleSubmit} className="ms-5 mt-5 d-flex flex-column gap-4 w-100">
-            <h4>Shto Nxënësin</h4>
+            <h4>Ndrysho të dhënat</h4>
             {error && <div className="alert alert-danger py-2">{error}</div>}
             <div className="d-flex gap-5 w-100 flex-wrap">
               <Input
@@ -158,12 +183,8 @@ function StudentAdd() {
                 onChange={(e) => setAdresa(e.target.value)}
               />
             </div>
-            <SignButton
-              type="submit"
-              className="sign-btn border-0 rounded-3 fw-semibold mt-3"
-              disabled={loading}
-            >
-              {loading ? "Duke shtuar…" : "Shto Nxënësin"}
+            <SignButton type="submit" className="sign-btn border-0 rounded-3 fw-semibold mt-3" disabled={loading}>
+              {loading ? "Duke ruajtur…" : "Ruaj ndryshimet"}
             </SignButton>
           </form>
         </div>
@@ -172,4 +193,4 @@ function StudentAdd() {
   );
 }
 
-export default StudentAdd;
+export default StudentEdit;

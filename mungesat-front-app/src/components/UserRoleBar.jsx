@@ -29,7 +29,7 @@ export default function UserRoleBar() {
         Je i kyçur si: <strong>{displayName}</strong>
         {" · "}
         Roli: <strong>{displayRole}</strong>
-        {displayRole === "Administrator" && " ✓"}
+        {(displayRole === "Administrator" || displayRole === "Kujdestar") && " ✓"}
       </span>
     </div>
   );

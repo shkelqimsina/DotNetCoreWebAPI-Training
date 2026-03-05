@@ -71,14 +71,17 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Kujdestar")]
+        [Authorize(Roles = "Kujdestar,Administrator")]
         public async Task<IActionResult> CreateAsync([FromBody] AddNxenesitDTO addNxenesitDTO)
         {
-            var klasatId = await GetKujdestarKlasatIdAsync();
-            if (!klasatId.HasValue)
-                return Forbid();
-            if (addNxenesitDTO.KlasatId != klasatId.Value)
-                return BadRequest("Mund të shtoni nxënës vetëm në klasën tuaj.");
+            if (!User.IsInRole("Administrator"))
+            {
+                var klasatId = await GetKujdestarKlasatIdAsync();
+                if (!klasatId.HasValue)
+                    return Forbid();
+                if (addNxenesitDTO.KlasatId != klasatId.Value)
+                    return BadRequest("Mund të shtoni nxënës vetëm në klasën tuaj.");
+            }
 
             var nxenesitModel = mapper.Map<Nxenesi>(addNxenesitDTO);
             nxenesitModel = await nxenesitRepository.CreateAsync(nxenesitModel);

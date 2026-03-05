@@ -79,17 +79,20 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Kujdestar")]
+        [Authorize(Roles = "Kujdestar,Administrator")]
         public async Task<IActionResult> Create([FromBody] AddMungesaDto addDto)
         {
-            var klasatId = await GetKujdestarKlasatIdAsync();
-            if (!klasatId.HasValue)
-                return Forbid();
-
             var nxenesi = await _dbContext.nxenesi.FindAsync(addDto.NxenesiId);
             if (nxenesi == null) return NotFound("Nxënësi nuk u gjet.");
-            if (nxenesi.KlasatId != klasatId.Value)
-                return BadRequest("Mund të regjistroni mungesa vetëm për nxënësit e klasës tuaj.");
+
+            if (!User.IsInRole("Administrator"))
+            {
+                var klasatId = await GetKujdestarKlasatIdAsync();
+                if (!klasatId.HasValue)
+                    return Forbid();
+                if (nxenesi.KlasatId != klasatId.Value)
+                    return BadRequest("Mund të regjistroni mungesa vetëm për nxënësit e klasës tuaj.");
+            }
 
             var mungesa = _mapper.Map<Mungesa>(addDto);
             mungesa.Arsyeja ??= "";

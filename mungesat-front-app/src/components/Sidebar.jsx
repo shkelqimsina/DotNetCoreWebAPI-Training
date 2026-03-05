@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import SideItem from "./SideItem";
 import eMungesat from "../assets/logos/eMungesat.png";
 import "../styles/screens/dashboard.css";
@@ -10,9 +12,22 @@ import { PiStudentBold } from "react-icons/pi";
 import { TbSettings } from "react-icons/tb";
 import { BiLogOut } from "react-icons/bi";
 import { MdErrorOutline } from "react-icons/md";
+import { AuthContext } from "../context/AuthContext";
+import axios from "../axiosInstance";
 
 function Sidebar() {
+  const navigate = useNavigate();
   const [showSidebar, setShowSidebar] = useState(true);
+  const { user, role, token, logout } = useContext(AuthContext);
+  const [me, setMe] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      axios.get("/account/me").then((r) => setMe(r.data)).catch(() => setMe(null));
+    } else {
+      setMe(null);
+    }
+  }, [token]);
 
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
@@ -34,7 +49,18 @@ function Sidebar() {
                 onClick={() => toggleSidebar()}
               />
             </div>
-            <div className="mt-5 p-0 w-100 d-flex flex-column gap-1">
+            {token && (
+              <div className="px-2 py-2 w-100 text-center rounded-2 mb-2" style={{ background: "rgba(255,255,255,0.12)" }}>
+                <div className="small text-white text-opacity-90">
+                  <strong>{me?.userName ?? user?.userName ?? "..."}</strong>
+                </div>
+                <div className="small text-white text-opacity-85">
+                  Roli: <strong>{me?.role ?? (role || (me ? "—" : "..."))}</strong>
+                  {(me?.isAdministrator ?? role === "Administrator") && " ✓"}
+                </div>
+              </div>
+            )}
+            <div className="mt-2 p-0 w-100 d-flex flex-column gap-1">
               <SideItem
                 icon={<TbLayoutDashboardFilled />}
                 title="Paneli i kryesor"
@@ -65,7 +91,17 @@ function Sidebar() {
                 title="Cilësimet"
                 path="/settings"
               />
-              <SideItem icon={<BiLogOut />} title="Kyqu" path="/" />
+              <button
+                type="button"
+                className="side-item m-1 d-flex align-items-center gap-3 px-3 rounded-3 w-100 border-0 bg-transparent text-white text-start"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                <span className="scale-125">{<BiLogOut />}</span>
+                <p className="mb-0">Dil (kyçu jashtë)</p>
+              </button>
             </div>
           </div>
         </>

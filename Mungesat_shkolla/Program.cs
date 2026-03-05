@@ -51,7 +51,8 @@ builder.Services.AddAuthentication(options =>
     ValidateIssuerSigningKey = true,
     ValidIssuer = builder.Configuration["JWT:Issuer"],
     ValidAudience = builder.Configuration["JWT:Audience"],
-    IssuerSigningKey = new SymmetricSecurityKey(key)
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    RoleClaimType = System.Security.Claims.ClaimTypes.Role
   };
 });
 
@@ -61,7 +62,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5179", "http://localhost:5181")  // React/Vite dev
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "http://localhost:5179", "http://localhost:5181")  // React/Vite dev
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

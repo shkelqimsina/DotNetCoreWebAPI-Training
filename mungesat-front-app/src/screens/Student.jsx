@@ -31,6 +31,18 @@ function Student() {
 
   const handleAddClick = () => navigate("/student-add");
 
+  const handleDelete = async (id, emri, mbiemri) => {
+    const emriPlote = [emri, mbiemri].filter(Boolean).join(" ").trim() || "ky nxënës";
+    if (!window.confirm(`A jeni të sigurt që doni të fshini nxënësin "${emriPlote}"?`)) return;
+    setError("");
+    try {
+      await axios.delete(`/Nxenesit/${id}`);
+      setNxenesit((prev) => prev.filter((n) => (n.id ?? n.Id) !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Fshirja dështoi.");
+    }
+  };
+
   const nxenesitNeklase = selectedKlasaId
     ? nxenesit.filter((n) => (n.klasatId ?? n.KlasatId) === selectedKlasaId)
     : [];
@@ -109,6 +121,14 @@ function Student() {
                   return (
                     <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
                       <span>{emri} {mbiemri}{prindi && ` – Prindi: ${prindi}`}{dateStr && ` (${dateStr})`}</span>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(id, emri, mbiemri); }}
+                        title={`Fshi ${emri} ${mbiemri}`}
+                      >
+                        Fshi
+                      </button>
                     </li>
                   );
                 })}

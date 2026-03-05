@@ -51,11 +51,14 @@ function StudentAdd() {
       });
       navigate("/student");
     } catch (err) {
-      const msg =
+      let msg =
         err.response?.data?.message ||
         (typeof err.response?.data === "string" ? err.response.data : null) ||
         err.message ||
         "Shtimi i nxënësit dështoi.";
+      if (err.response?.status === 403)
+        msg =
+          "Nuk keni të drejtë të shtoni nxënës. Vetëm kujdestari i klasës ose administratori mund të shtojë nxënës. Sigurohuni që keni kyçur me llogarinë e duhur.";
       setError(msg);
     } finally {
       setLoading(false);

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Models;
 using Mungesat_shkolla.Interfaces;
 using Mungesat_shkolla.DTO;
+using System.Security.Claims;
 
 namespace api.Controllers;
 
@@ -26,6 +28,31 @@ public class AccountController : ControllerBase
     _roleManager = roleManager;
     _tokenService = tokenService;
     _signinManager = signInManager;
+  }
+
+  [HttpGet("me")]
+  [Authorize]
+  public async Task<IActionResult> Me()
+  {
+    var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+    if (string.IsNullOrEmpty(sub) || !int.TryParse(sub, out var userId))
+      return Unauthorized(new { message = "Token i pavlefshëm." });
+
+    var user = await _userManager.FindByIdAsync(userId.ToString());
+    if (user == null)
+      return Unauthorized(new { message = "Përdoruesi nuk u gjet." });
+
+    var roles = await _userManager.GetRolesAsync(user);
+    var role = roles.FirstOrDefault() ?? "";
+
+    return Ok(new
+    {
+      userName = user.UserName,
+      email = user.Email,
+      role,
+      isAdministrator = User.IsInRole("Administrator"),
+      isKujdestar = User.IsInRole("Kujdestar")
+    });
   }
 
   [HttpPost("login")]

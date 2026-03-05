@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
+import UserRoleBar from "./components/UserRoleBar";
 import SignForm from "./screens/SignForm";
 import Teacher from "./screens/Teacher";
 import TeacherAdd from "./screens/TeacherAdd";
@@ -14,10 +15,9 @@ import MissingAdd from "./screens/MissingAdd";
 import Settings from "./screens/Settings";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
     <Router>
+      <UserRoleBar />
       <Routes>
         <Route path="/" element={<SignForm />} />
         <Route path="/dashboard" element={<SignForm />} />

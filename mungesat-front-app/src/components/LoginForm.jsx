@@ -36,9 +36,13 @@ function LoginForm() {
 
     try {
       await login(formData.username, formData.password);
-      navigate("/dashboard");
+      navigate("/teacher");
     } catch (err) {
-      const msg = err.response?.data?.message ?? err.response?.data ?? err.message ?? "Kredencialet janë të gabuara.";
+      const data = err.response?.data;
+      const msg =
+        (typeof data === "string" ? data : data?.message) ||
+        err.message ||
+        "Emri i përdoruesit ose fjalëkalimi janë gabim. Provoni përsëri.";
       setError(typeof msg === "string" ? msg : "Kredencialet janë të gabuara.");
     } finally {
       setLoading(false);
@@ -76,9 +80,9 @@ function LoginForm() {
           />
         )}
       </div>
-      <a className="forgot-p text-end text-decoration-none">
-        Keni harruar fjalëkalimin?
-      </a>
+      <p className="forgot-p text-end text-decoration-none small text-muted mb-0 mt-1">
+        Keni harruar fjalëkalimin? Kontaktoni administratorin që ta rivendosë (Kujdestarët → Ndrysho kujdestarin).
+      </p>
       {error && <div className="alert alert-danger py-2 mb-0">{error}</div>}
       <SignButton
         className="sign-btn border-0 rounded-3 fw-semibold mt-3"

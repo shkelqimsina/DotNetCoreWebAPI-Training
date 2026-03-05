@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Mungesat_shkolla.Data;
 using Mungesat_shkolla.Models;
 using Mungesat_shkolla.Interfaces;
 using Mungesat_shkolla.DTO;
+using System.Security.Claims;
 
 namespace api.Controllers;
 
@@ -13,13 +15,56 @@ namespace api.Controllers;
 public class AccountController : ControllerBase
 {
   private readonly UserManager<Kujdestari> _userManager;
+  private readonly RoleManager<IdentityRole<int>> _roleManager;
   private readonly ITokenService _tokenService;
   private readonly SignInManager<Kujdestari> _signinManager;
-  public AccountController(UserManager<Kujdestari> userManager, ITokenService tokenService, SignInManager<Kujdestari> signInManager)
+  private readonly MungesatDbContext _dbContext;
+
+  public AccountController(
+    UserManager<Kujdestari> userManager,
+    RoleManager<IdentityRole<int>> roleManager,
+    ITokenService tokenService,
+    SignInManager<Kujdestari> signInManager,
+    MungesatDbContext dbContext)
   {
     _userManager = userManager;
+    _roleManager = roleManager;
     _tokenService = tokenService;
     _signinManager = signInManager;
+    _dbContext = dbContext;
+  }
+
+  [HttpGet("me")]
+  [Authorize]
+  public async Task<IActionResult> Me()
+  {
+    var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+    if (string.IsNullOrEmpty(sub) || !int.TryParse(sub, out var userId))
+      return Unauthorized(new { message = "Token i pavlefshëm." });
+
+    var user = await _userManager.FindByIdAsync(userId.ToString());
+    if (user == null)
+      return Unauthorized(new { message = "Përdoruesi nuk u gjet." });
+
+    var roles = await _userManager.GetRolesAsync(user);
+    var role = roles.FirstOrDefault() ?? "";
+
+    int? klasatId = null;
+    if (User.IsInRole("Kujdestar"))
+    {
+      var klasa = await _dbContext.Klasat.AsNoTracking().FirstOrDefaultAsync(k => k.KujdestariId == userId);
+      klasatId = klasa?.Id;
+    }
+
+    return Ok(new
+    {
+      userName = user.UserName,
+      email = user.Email,
+      role,
+      isAdministrator = User.IsInRole("Administrator"),
+      isKujdestar = User.IsInRole("Kujdestar"),
+      klasatId
+    });
   }
 
   [HttpPost("login")]
@@ -28,22 +73,28 @@ public class AccountController : ControllerBase
     if (!ModelState.IsValid)
       return BadRequest(ModelState);
 
-    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+    var username = loginDto.Username?.Trim();
+    if (string.IsNullOrEmpty(username))
+      return BadRequest(new { message = "Shkruani emrin e përdoruesit." });
 
-    if (user == null) return Unauthorized("Invalid username!");
+    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username.ToLowerInvariant());
+    if (user == null)
+      return Unauthorized(new { message = "Përdoruesi me këtë emër nuk u gjet. Kontrolloni emrin ose regjistrohuni." });
 
-    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password ?? "", false);
+    if (!result.Succeeded)
+      return Unauthorized(new { message = "Fjalëkalimi është i gabuar. Provoni përsëri." });
 
-    if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
+    var roles = await _userManager.GetRolesAsync(user);
+    var role = roles.FirstOrDefault() ?? "";
 
-    return Ok(
-        new NewUserDto
-        {
-          UserName = user.UserName,
-          Email = user.Email,
-          Token = _tokenService.CreateToken(user)
-        }
-    );
+    return Ok(new NewUserDto
+    {
+      UserName = user.UserName,
+      Email = user.Email ?? "",
+      Token = await _tokenService.CreateTokenAsync(user),
+      Role = role
+    });
   }
 
   [HttpPost("register")]
@@ -62,18 +113,30 @@ public class AccountController : ControllerBase
         Email = registerDto.Email ?? "",
       };
 
+      // Përcaktojmë rolin PARA krijimit: nëse nuk ka asnjë përdorues, ky do të jetë Administrator
+      var numriPerdoruesvePara = await _userManager.Users.CountAsync();
+      var doJeteAdministrator = (numriPerdoruesvePara == 0);
+
       var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password ?? "");
 
       if (createdUser.Succeeded)
       {
-          return Ok(
-              new NewUserDto
-              {
-                UserName = appUser.UserName,
-                Email = appUser.Email,
-                Token = _tokenService.CreateToken(appUser)
-              }
-          );
+        var roleName = doJeteAdministrator ? "Administrator" : "Kujdestar";
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if (!roleExists)
+          await _roleManager.CreateAsync(new IdentityRole<int>(roleName));
+
+        var roleResult = await _userManager.AddToRoleAsync(appUser, roleName);
+        if (!roleResult.Succeeded)
+          return StatusCode(500, new { message = "Përdoruesi u krijua por roli nuk u caktua.", errors = roleResult.Errors.Select(e => e.Description).ToList() });
+
+        return Ok(new NewUserDto
+        {
+          UserName = appUser.UserName,
+          Email = appUser.Email ?? "",
+          Token = await _tokenService.CreateTokenAsync(appUser),
+          Role = roleName
+        });
       }
       else
       {
@@ -86,5 +149,27 @@ public class AccountController : ControllerBase
       var msg = ex.InnerException?.Message ?? ex.Message;
       return StatusCode(500, new { message = "Gabim i brendshëm. Provoni përsëri.", detail = msg });
     }
+  }
+
+  /// <summary>Vetëm administratori mund të rivendosë fjalëkalimin e një përdoruesi (p.sh. kur kujdestari e ka harruar).</summary>
+  [HttpPost("reset-password")]
+  [Authorize(Roles = "Administrator")]
+  public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+  {
+    if (string.IsNullOrWhiteSpace(dto.UserName))
+      return BadRequest(new { message = "Shkruani emrin e përdoruesit (username)." });
+    if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+      return BadRequest(new { message = "Fjalëkalimi i ri duhet të përmbajë të paktën 6 karaktere." });
+
+    var user = await _userManager.FindByNameAsync(dto.UserName.Trim().ToLowerInvariant());
+    if (user == null)
+      return NotFound(new { message = "Përdoruesi me këtë emër nuk u gjet." });
+
+    await _userManager.RemovePasswordAsync(user);
+    var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+    if (!result.Succeeded)
+      return BadRequest(new { message = "Fjalëkalimi nuk u ndryshua.", errors = result.Errors.Select(e => e.Description).ToList() });
+
+    return Ok(new { message = "Fjalëkalimi u ndryshua. Përdoruesi mund të kyçet me fjalëkalimin e ri." });
   }
 }

@@ -65,9 +65,12 @@ function Missings() {
                 const mbiemri = m.mbiemriNxenesit ?? m.MbiemriNxenesit ?? "";
                 const arsyeja = m.arsyeja ?? m.Arsyeja ?? "";
                 const oretRaw = m.oret ?? m.Oret ?? "";
-                const oretDisplay = oretRaw
-                  ? "Ora " + oretRaw.split(",").map((o) => o.trim()).filter(Boolean).join(", ")
-                  : "";
+                const oretList = oretRaw ? oretRaw.split(",").map((o) => o.trim()).filter(Boolean) : [];
+                const oretDisplay = oretList.length === 7
+                  ? "Tëre ditën"
+                  : oretList.length
+                    ? "Ora " + oretList.join(", ")
+                    : "";
                 return (
                   <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
                     <span>

@@ -22,6 +22,11 @@ function MissingAdd() {
     );
   };
 
+  const tereDiten = oretZgjidhura.length === 7;
+  const toggleTereDiten = () => {
+    setOretZgjidhura(tereDiten ? [] : [1, 2, 3, 4, 5, 6, 7]);
+  };
+
   useEffect(() => {
     axios
       .get("/Nxenesit")
@@ -118,6 +123,15 @@ function MissingAdd() {
               Oret – zgjidhni në cilat ore ka munguar (të paktën një)
             </label>
             <div className="d-flex flex-wrap gap-3 align-items-center">
+              <label className="d-flex align-items-center gap-2 mb-0 cursor-pointer fw-semibold">
+                <input
+                  type="checkbox"
+                  checked={tereDiten}
+                  onChange={toggleTereDiten}
+                  className="form-check-input"
+                />
+                <span>Tëre ditën</span>
+              </label>
               {[1, 2, 3, 4, 5, 6, 7].map((ore) => (
                 <label key={ore} className="d-flex align-items-center gap-2 mb-0 cursor-pointer">
                   <input

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mungesat_shkolla.Data;
 using Mungesat_shkolla.Models;
@@ -33,8 +33,11 @@ namespace Mungesat_shkolla.Repositories
 
         public async Task<Nxenesi?> DeleteByIdAsync(int id)
         {
+            var nxenesi = await dbContext.nxenesi.FindAsync(id);
+            if (nxenesi == null) return null;
+            dbContext.nxenesi.Remove(nxenesi);
             await dbContext.SaveChangesAsync();
-            return await dbContext.nxenesi.FirstOrDefaultAsync(x => x.Id == id);
+            return nxenesi;
         }
 
         async Task<Nxenesi?> INxenesitRepository.CreateAsync(Nxenesi nxenesi)

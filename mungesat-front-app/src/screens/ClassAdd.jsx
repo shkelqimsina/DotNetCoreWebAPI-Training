@@ -40,7 +40,9 @@ function ClassAdd() {
       await axios.post("/Klasat", { emri, kujdestariId: parseInt(kujdestariId, 10) });
       navigate("/class");
     } catch (err) {
-      const msg = err.response?.data?.errors?.join?.(" ") || err.response?.data?.message || err.message || "Dështoi shtimi i klasës.";
+      let msg = err.response?.data?.errors?.join?.(" ") || err.response?.data?.message || err.message || "Dështoi shtimi i klasës.";
+      if (err.response?.status === 403)
+        msg = "Vetëm administratori mund të shtojë klasa. Dil dhe kyçu me një llogari administratori.";
       setError(msg);
     } finally {
       setLoading(false);

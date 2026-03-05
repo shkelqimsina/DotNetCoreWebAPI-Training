@@ -34,7 +34,7 @@ builder.Services.AddIdentity<Kujdestari, IdentityRole<int>>()
     .AddEntityFrameworkStores<MungesatDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure JWT authentication
+// Configure JWT authentication – përdorim "role" që tokeni e dërgon me këtë emër (për Administrator dhe Kujdestar)
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT:SigningKey"]);
 builder.Services.AddAuthentication(options =>
 {
@@ -43,6 +43,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+  options.MapInboundClaims = false;
   options.TokenValidationParameters = new TokenValidationParameters
   {
     ValidateIssuer = true,
@@ -51,7 +52,8 @@ builder.Services.AddAuthentication(options =>
     ValidateIssuerSigningKey = true,
     ValidIssuer = builder.Configuration["JWT:Issuer"],
     ValidAudience = builder.Configuration["JWT:Audience"],
-    IssuerSigningKey = new SymmetricSecurityKey(key)
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    RoleClaimType = "role"
   };
 });
 
@@ -61,13 +63,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5179", "http://localhost:5181")  // React/Vite dev
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "http://localhost:5179", "http://localhost:5181")  // React/Vite dev
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
+
+// Role seeding është çaktivizuar në nisje – nëse tabela Roles nuk ka Id IDENTITY, aplikacioni nuk do të përmbyste.
+// Shtoni rolet me skriptin Scripts/RregulloRolesIdIdentity.sql, pastaj (opsional) aktivizoni këtë bllok përsëri.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import { SignButton } from "../components/Button";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { AuthContext } from "../context/AuthContext";
 import "../styles/screens/signForm.css";
 
 function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { register: registerUser } = useContext(AuthContext);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -34,38 +36,29 @@ function RegisterForm() {
     setError("");
 
     try {
-      const response = await fetch("/api/account/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const data = await registerUser(
+        formData.username,
+        formData.emri,
+        formData.mbiemri,
+        formData.email,
+        formData.password
+      );
 
-      const text = await response.text();
-      const data = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
-      if (!response.ok) {
-        const parts = [];
-        if (data.title) parts.push(data.title);
-        if (data.message) parts.push(data.message);
-        if (data.detail) parts.push(data.detail);
-        if (data.errors) {
-          if (Array.isArray(data.errors)) {
-            parts.push(data.errors.join(" "));
-          } else if (typeof data.errors === "object") {
-            const list = Object.entries(data.errors).flatMap(([key, val]) =>
-              (Array.isArray(val) ? val : [val]).map((m) => (key === "Email" ? "Email: duhet të jetë adresë e vlefshme (p.sh. emri@domain.com)." : `${key}: ${m}`))
-            );
-            parts.push(list.join(" "));
-          }
-        }
-        const msg = parts.length ? parts.join(" — ") : (text || "Regjistrimi dështoi.");
-        throw new Error(msg);
+      if (data && data.token) {
+        navigate("/dashboard");
+      } else {
+        setError("Regjistrimi dështoi.");
       }
-
-      navigate("/dashboard");
     } catch (err) {
-      const msg = err.message || "";
+      const res = err.response;
+      let msg = err.message || "";
+      if (res?.data) {
+        if (typeof res.data === "string") msg = res.data;
+        else if (res.data.message) msg = res.data.message;
+        else if (res.data.errors && Array.isArray(res.data.errors)) msg = res.data.errors.join(" ");
+      }
       if (msg.includes("fetch") || msg.includes("Network") || msg.includes("Failed"))
-        setError("Lidhja me serverin dështoi. Sigurohuni që API është i ndezur (http://localhost:5050).");
+        setError("Lidhja me serverin dështoi. Sigurohuni që API është i ndezur.");
       else
         setError(msg || "Regjistrimi dështoi.");
     } finally {

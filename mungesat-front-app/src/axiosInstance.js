@@ -1,7 +1,12 @@
 import axios from "axios";
 
+// Në prodhim vendosni VITE_API_URL (p.sh. https://emungesat.shkolla.edu) gjatë build; për dev përdoret /api (proxy).
+const apiBase = import.meta.env.VITE_API_URL
+  ? `${String(import.meta.env.VITE_API_URL).replace(/\/$/, "")}/api`
+  : "/api";
+
 const axiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: apiBase,
   headers: {
     "Content-Type": "application/json",
   },

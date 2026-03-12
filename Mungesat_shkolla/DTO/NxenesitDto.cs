@@ -1,4 +1,4 @@
-﻿namespace Mungesat_shkolla.DTO
+namespace Mungesat_shkolla.DTO
 {
     public class NxenesitDto
     {
@@ -12,6 +12,7 @@
         public required string Prindi { get; set; }
 
         public required int KlasatId { get; set; }
-
+        /// <summary>Id e përdoruesit (roli Prindi) të lidhur me këtë nxënës.</summary>
+        public int? PrindiUserId { get; set; }
     }
 }

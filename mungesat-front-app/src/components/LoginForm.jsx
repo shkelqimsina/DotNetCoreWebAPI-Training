@@ -35,8 +35,9 @@ function LoginForm() {
     setError("");
 
     try {
-      await login(formData.username, formData.password);
-      navigate("/teacher");
+      const data = await login(formData.username, formData.password);
+      if (data?.role === "Prindi" || data?.role === "Drejtori") navigate("/missings");
+      else navigate("/teacher");
     } catch (err) {
       const data = err.response?.data;
       const msg =

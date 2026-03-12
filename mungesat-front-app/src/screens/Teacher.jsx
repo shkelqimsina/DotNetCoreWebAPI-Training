@@ -32,6 +32,20 @@ function Teacher() {
     navigate("/teacher-add");
   };
 
+  const handleDelete = async (kujdestari) => {
+    const id = kujdestari.id ?? kujdestari.Id;
+    const emri = [kujdestari.emri ?? kujdestari.Emri, kujdestari.mbiemri ?? kujdestari.Mbiemri].filter(Boolean).join(" ") || "Ky kujdestar";
+    if (!window.confirm(`A jeni të sigurt që dëshironi të fshini kujdestarin "${emri}"? Klasa e lidhur (nëse ka) do të mbetet pa kujdestar.`)) return;
+    setError("");
+    try {
+      await axios.delete(`/Kujdestaret/${id}`);
+      setKujdestaret((prev) => prev.filter((k) => (k.id ?? k.Id) !== id));
+    } catch (err) {
+      const msg = err.response?.data?.message || err.response?.data?.detail || err.message || "Fshirja dështoi.";
+      setError(typeof msg === "string" ? msg : "Fshirja dështoi.");
+    }
+  };
+
   const isEmpty = !loading && kujdestaret.length === 0;
 
   return (
@@ -73,13 +87,22 @@ function Teacher() {
                 return (
                   <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
                     <span>{emri} {mbiemri} {email && `(${email})`}</span>
-                    <button
-                      type="button"
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => navigate(`/teacher-edit/${id}`)}
-                    >
-                      Ndrysho
-                    </button>
+                    <div className="d-flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => navigate(`/teacher-edit/${id}`)}
+                      >
+                        Ndrysho
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDelete(k)}
+                      >
+                        Fshi
+                      </button>
+                    </div>
                   </li>
                 );
               })}

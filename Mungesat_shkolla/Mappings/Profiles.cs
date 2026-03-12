@@ -14,7 +14,7 @@ namespace Mungesat_shkolla.Mappings
             CreateMap<KlasatDto, Klasat>().ReverseMap();
             CreateMap<KujdestariDto, Kujdestari>().ReverseMap();
             CreateMap<KujdestariUpdate, Kujdestari>().ReverseMap();
-            CreateMap<Mungesa, MungesaDto>().ForMember(d => d.EmriNxenesit, o => o.Ignore()).ForMember(d => d.MbiemriNxenesit, o => o.Ignore());
+            CreateMap<Mungesa, MungesaDto>().ForMember(d => d.EmriNxenesit, o => o.Ignore()).ForMember(d => d.MbiemriNxenesit, o => o.Ignore()).ForMember(d => d.EmriKlases, o => o.Ignore());
             CreateMap<AddMungesaDto, Mungesa>();
         }
     }

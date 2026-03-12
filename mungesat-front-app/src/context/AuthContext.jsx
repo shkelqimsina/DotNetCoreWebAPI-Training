@@ -4,47 +4,43 @@ import axios from "axios";
 const AuthContext = createContext();
 
 // Përdorim URL relative që Vite t’i dërgojë te API (proxy)
+const apiBase = import.meta.env.VITE_API_URL
+  ? `${String(import.meta.env.VITE_API_URL).replace(/\/$/, "")}/api`
+  : "/api";
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: apiBase,
   headers: { "Content-Type": "application/json" },
 });
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const getRoleFromToken = (payload) =>
-    payload.role || payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || "";
+  const [role, setRole] = useState("");
 
-  const [role, setRole] = useState(() => {
-    try {
-      const t = localStorage.getItem("token");
-      if (!t) return "";
-      const payload = JSON.parse(atob(t.split(".")[1]) || "{}");
-      return getRoleFromToken(payload);
-    } catch {
-      return "";
-    }
-  });
-
+  // Kur kemi token, marrim rolin nga /account/me (serveri përdor prioritet: Administrator > Drejtori > Kujdestar > Prindi)
   useEffect(() => {
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]) || "{}");
-        const roleClaim = getRoleFromToken(payload);
-        setUser({
-          userName: payload.given_name || payload.email,
-          email: payload.email,
-          role: roleClaim || role,
-        });
-        if (roleClaim) setRole(roleClaim);
-      } catch {
-        setUser(null);
-        setRole("");
-      }
-    } else {
+    if (!token) {
       setUser(null);
       setRole("");
+      return;
     }
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    api
+      .get("/account/me")
+      .then((res) => {
+        const data = res.data;
+        const serverRole = data.role || "";
+        setRole(serverRole);
+        setUser({
+          userName: data.userName,
+          email: data.email ?? "",
+          role: serverRole,
+        });
+      })
+      .catch(() => {
+        setUser(null);
+        setRole("");
+      });
   }, [token]);
 
   const login = async (username, password) => {
@@ -54,6 +50,7 @@ const AuthProvider = ({ children }) => {
     setToken(newToken);
     setRole(userRole || "");
     setUser({ userName: userName || username, email: email || "", role: userRole || "" });
+    return { role: userRole || "" };
   };
 
   const logout = () => {
@@ -63,14 +60,20 @@ const AuthProvider = ({ children }) => {
     setRole("");
   };
 
-  const register = async (username, emri, mbiemri, email, password) => {
-    const response = await api.post("/account/register", {
+  const register = async (username, emri, mbiemri, email, password, role = "Kujdestar", adminUserName, adminPassword) => {
+    const body = {
       username,
       emri,
       mbiemri,
       email,
       password,
-    });
+      role: role === "Prindi" ? "Prindi" : role === "Drejtori" ? "Drejtori" : "Kujdestar",
+    };
+    if ((role === "Kujdestar" || role === "Drejtori") && (adminUserName != null && adminUserName !== "")) {
+      body.adminUserName = adminUserName;
+      body.adminPassword = adminPassword ?? "";
+    }
+    const response = await api.post("/account/register", body);
     const data = response.data;
     if (data.token) {
       setToken(data.token);
@@ -82,9 +85,11 @@ const AuthProvider = ({ children }) => {
 
   const isAdministrator = role === "Administrator";
   const isKujdestar = role === "Kujdestar";
+  const isPrindi = role === "Prindi";
+  const isDrejtori = role === "Drejtori";
 
   return (
-    <AuthContext.Provider value={{ user, token, role, isAdministrator, isKujdestar, login, logout, register }}>
+    <AuthContext.Provider value={{ user, token, role, isAdministrator, isKujdestar, isPrindi, isDrejtori, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

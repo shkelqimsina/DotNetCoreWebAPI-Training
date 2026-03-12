@@ -1,6 +1,6 @@
 namespace Mungesat_shkolla.DTO
 {
-    public class AddMungesaDto
+    public class UpdateMungesaDto
     {
         public DateTime Data { get; set; }
         public string? Arsyeja { get; set; }
@@ -8,6 +8,5 @@ namespace Mungesat_shkolla.DTO
         public bool MeArsyje { get; set; }
         /// <summary>Orët që janë me arsyje (p.sh. "6" ose "1,6").</summary>
         public string? OretMeArsyje { get; set; }
-        public int NxenesiId { get; set; }
     }
 }

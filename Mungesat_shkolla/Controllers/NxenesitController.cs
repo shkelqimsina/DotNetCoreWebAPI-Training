@@ -43,9 +43,12 @@ namespace Mungesat_shkolla.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
+            var userId = GetCurrentUserId();
             var klasatId = await GetKujdestarKlasatIdAsync();
             List<Nxenesi> nxenesit;
-            if (User.IsInRole("Administrator"))
+            if (User.IsInRole("Prindi") && userId.HasValue)
+                nxenesit = await dbContext.nxenesi.Where(n => n.PrindiUserId == userId.Value).ToListAsync();
+            else if (User.IsInRole("Administrator"))
                 nxenesit = await nxenesitRepository.GetAllAsync();
             else if (klasatId.HasValue)
                 nxenesit = await dbContext.nxenesi.Where(n => n.KlasatId == klasatId.Value).ToListAsync();
@@ -63,9 +66,18 @@ namespace Mungesat_shkolla.Controllers
             var nxenesiDomain = await nxenesitRepository.GetByIdAsync(id);
             if (nxenesiDomain == null) return NotFound();
 
-            var klasatId = await GetKujdestarKlasatIdAsync();
-            if (!User.IsInRole("Administrator") && klasatId.HasValue && nxenesiDomain.KlasatId != klasatId.Value)
-                return Forbid();
+            var userId = GetCurrentUserId();
+            if (User.IsInRole("Prindi"))
+            {
+                if (!userId.HasValue || nxenesiDomain.PrindiUserId != userId.Value)
+                    return Forbid();
+            }
+            else
+            {
+                var klasatId = await GetKujdestarKlasatIdAsync();
+                if (!User.IsInRole("Administrator") && klasatId.HasValue && nxenesiDomain.KlasatId != klasatId.Value)
+                    return Forbid();
+            }
 
             return Ok(mapper.Map<NxenesitDto>(nxenesiDomain));
         }

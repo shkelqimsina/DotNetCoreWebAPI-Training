@@ -11,5 +11,7 @@ namespace Mungesat_shkolla.DTO
         public string? Password { get; set; }
         /// <summary>Klasa ku ky kujdestar do të caktohet (opsional).</summary>
         public int? KlasatId { get; set; }
+        /// <summary>Roli: "Kujdestar" (parazgjedhje) ose "Drejtori". Drejtorin mund ta shtojë vetëm Administratori.</summary>
+        public string? Role { get; set; }
     }
 }

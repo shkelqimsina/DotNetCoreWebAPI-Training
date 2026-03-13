@@ -55,7 +55,7 @@ namespace Mungesat_shkolla.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator,Drejtori")]
         public async Task<IActionResult> CreateAsync([FromBody] KujdestariDto kujdestaridto)
         {
             if (string.IsNullOrWhiteSpace(kujdestaridto.Password))
@@ -64,6 +64,15 @@ namespace Mungesat_shkolla.Controllers
             var userName = (kujdestaridto.UserName ?? kujdestaridto.Email)?.Trim().ToLowerInvariant() ?? "";
             if (string.IsNullOrEmpty(userName))
                 return BadRequest(new { message = "Shkruani emrin e përdoruesit ose email-in." });
+
+            var roleName = (kujdestaridto.Role ?? "").Trim();
+            if (roleName == "Drejtori")
+            {
+                if (!User.IsInRole("Administrator"))
+                    return Forbid();
+            }
+            else
+                roleName = "Kujdestar";
 
             var kujdestar = mapper.Map<Kujdestari>(kujdestaridto);
             kujdestar.UserName = userName;
@@ -78,12 +87,11 @@ namespace Mungesat_shkolla.Controllers
                 return BadRequest(new { message = "Kujdestari nuk u krijua.", errors });
             }
 
-            var roleName = "Kujdestar";
             if (!await roleManager.RoleExistsAsync(roleName))
                 await roleManager.CreateAsync(new IdentityRole<int>(roleName));
             await userManager.AddToRoleAsync(kujdestar, roleName);
 
-            if (kujdestaridto.KlasatId.HasValue && kujdestaridto.KlasatId.Value > 0)
+            if (roleName == "Kujdestar" && kujdestaridto.KlasatId.HasValue && kujdestaridto.KlasatId.Value > 0)
             {
                 var klasa = await dbContext.Klasat.FindAsync(kujdestaridto.KlasatId.Value);
                 if (klasa != null)
@@ -150,6 +158,31 @@ namespace Mungesat_shkolla.Controllers
 
             var response = new KujdestariListDto { Id = kujdestar.Id, Emri = kujdestar.Emri, Mbiemri = kujdestar.Mbiemri };
             return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var kujdestar = await userManager.FindByIdAsync(id.ToString());
+            if (kujdestar == null)
+                return NotFound(new { message = "Kujdestari nuk u gjet." });
+
+            var klasatMeKeteKujdestar = await dbContext.Klasat.Where(k => k.KujdestariId == id).ToListAsync();
+            foreach (var klasa in klasatMeKeteKujdestar)
+            {
+                klasa.KujdestariId = null;
+            }
+            await dbContext.SaveChangesAsync();
+
+            var deleteResult = await userManager.DeleteAsync(kujdestar);
+            if (!deleteResult.Succeeded)
+            {
+                var errors = deleteResult.Errors.Select(e => e.Description).ToList();
+                return BadRequest(new { message = "Kujdestari nuk u fshi.", errors });
+            }
+
+            return NoContent();
         }
 
         [HttpPut]

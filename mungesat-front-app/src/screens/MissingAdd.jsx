@@ -11,20 +11,30 @@ function MissingAdd() {
   const [nxenesiId, setNxenesiId] = useState("");
   const [data, setData] = useState("");
   const [arsyeja, setArsyeja] = useState("");
+  const [oretMeArsyje, setOretMeArsyje] = useState([]); // orët që janë me arsyje, nënbashkësi e oretZgjidhura
   const [oretZgjidhura, setOretZgjidhura] = useState([]); // [1, 2, 5] = Ora 1, 2, 5
   const [nxenesit, setNxenesit] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const toggleOre = (ore) => {
-    setOretZgjidhura((prev) =>
-      prev.includes(ore) ? prev.filter((o) => o !== ore) : [...prev, ore].sort((a, b) => a - b)
-    );
+    setOretZgjidhura((prev) => {
+      const isRemoving = prev.includes(ore);
+      if (isRemoving) setOretMeArsyje((p) => p.filter((o) => o !== ore));
+      return isRemoving ? prev.filter((o) => o !== ore) : [...prev, ore].sort((a, b) => a - b);
+    });
   };
 
   const tereDiten = oretZgjidhura.length === 7;
   const toggleTereDiten = () => {
     setOretZgjidhura(tereDiten ? [] : [1, 2, 3, 4, 5, 6, 7]);
+    if (tereDiten) setOretMeArsyje([]);
+  };
+
+  const toggleOreMeArsyje = (ore) => {
+    setOretMeArsyje((prev) =>
+      prev.includes(ore) ? prev.filter((o) => o !== ore) : [...prev, ore].sort((a, b) => a - b)
+    );
   };
 
   useEffect(() => {
@@ -53,6 +63,8 @@ function MissingAdd() {
         data: data || new Date().toISOString().slice(0, 10),
         arsyeja: arsyeja.trim() || null,
         oret: oretZgjidhura.join(","),
+        meArsyje: oretMeArsyje.length === oretZgjidhura.length && oretZgjidhura.length > 0,
+        oretMeArsyje: oretMeArsyje.length > 0 ? oretMeArsyje.join(",") : null,
         nxenesiId: parseInt(nxenesiId, 10),
       });
       navigate("/missings");
@@ -120,28 +132,49 @@ function MissingAdd() {
               onChange={(e) => setArsyeja(e.target.value)}
             />
             <label className="form-label text-secondary mb-1 fw-semibold">
-              Oret – zgjidhni në cilat ore ka munguar (të paktën një)
+              Oret – zgjidhni në cilat ore ka munguar dhe cilat janë me arsyje (të paktën një)
             </label>
-            <div className="d-flex flex-wrap gap-3 align-items-center">
-              <label className="d-flex align-items-center gap-2 mb-0 cursor-pointer fw-semibold">
+            <div className="d-flex flex-wrap align-items-center ore-checkbox-group">
+              <label
+                className={`ore-checkbox ore-checkbox-all mb-0 ${
+                  tereDiten ? "ore-checkbox--checked" : ""
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={tereDiten}
                   onChange={toggleTereDiten}
-                  className="form-check-input"
+                  className="form-check-input ore-checkbox-input"
                 />
-                <span>Tëre ditën</span>
+                <span className="ore-checkbox-label">Tëre ditën</span>
               </label>
               {[1, 2, 3, 4, 5, 6, 7].map((ore) => (
-                <label key={ore} className="d-flex align-items-center gap-2 mb-0 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={oretZgjidhura.includes(ore)}
-                    onChange={() => toggleOre(ore)}
-                    className="form-check-input"
-                  />
-                  <span>Ora {ore}</span>
-                </label>
+                <div key={ore} className="d-inline-flex align-items-center gap-1 flex-wrap">
+                  <label
+                    className={`ore-checkbox mb-0 ${
+                      oretZgjidhura.includes(ore) ? "ore-checkbox--checked" : ""
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={oretZgjidhura.includes(ore)}
+                      onChange={() => toggleOre(ore)}
+                      className="form-check-input ore-checkbox-input"
+                    />
+                    <span className="ore-checkbox-label">Ora {ore}</span>
+                  </label>
+                  {oretZgjidhura.includes(ore) && (
+                    <label className="d-inline-flex align-items-center gap-1 small mb-0 ms-1">
+                      <input
+                        type="checkbox"
+                        checked={oretMeArsyje.includes(ore)}
+                        onChange={() => toggleOreMeArsyje(ore)}
+                        className="form-check-input"
+                      />
+                      <span>me arsyje</span>
+                    </label>
+                  )}
+                </div>
               ))}
             </div>
             <SignButton

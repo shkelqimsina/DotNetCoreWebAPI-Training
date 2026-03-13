@@ -1,4 +1,4 @@
-﻿namespace Mungesat_shkolla.DTO
+namespace Mungesat_shkolla.DTO
 {
     public class UpdateNxenesitDto
     {
@@ -11,6 +11,6 @@
         public required string Prindi { get; set; }
 
         public required int KlasatId { get; set; }
-
+        public int? PrindiUserId { get; set; }
     }
 }

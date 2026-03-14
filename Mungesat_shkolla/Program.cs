@@ -4,6 +4,7 @@ using Mungesat_shkolla.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Mungesat_shkolla.Models;
@@ -77,8 +78,37 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Role seeding është çaktivizuar në nisje – nëse tabela Roles nuk ka Id IDENTITY, aplikacioni nuk do të përmbyste.
-// Shtoni rolet me skriptin Scripts/RregulloRolesIdIdentity.sql, pastaj (opsional) aktivizoni këtë bllok përsëri.
+// Seed: nëse nuk ka asnjë përdorues, krijohet një Administrator me emër/fjalëkalim të konfigurueshëm (p.sh. për PC të re në shkollë).
+using (var scope = app.Services.CreateScope())
+{
+  var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Kujdestari>>();
+  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+  var numUsers = await userManager.Users.CountAsync();
+  if (numUsers == 0)
+  {
+    const string adminRole = "Administrator";
+    if (!await roleManager.RoleExistsAsync(adminRole))
+      await roleManager.CreateAsync(new IdentityRole<int>(adminRole));
+    var adminUserName = builder.Configuration["SeedAdmin:UserName"] ?? "admin";
+    var adminPassword = builder.Configuration["SeedAdmin:Password"] ?? "Admin123!";
+    var adminUser = new Kujdestari
+    {
+      UserName = adminUserName.ToLowerInvariant(),
+      NormalizedUserName = adminUserName.ToUpperInvariant(),
+      Email = builder.Configuration["SeedAdmin:Email"] ?? $"{adminUserName}@localhost",
+      NormalizedEmail = (builder.Configuration["SeedAdmin:Email"] ?? $"{adminUserName}@localhost").ToUpperInvariant(),
+      Emri = builder.Configuration["SeedAdmin:Emri"] ?? "Administrator",
+      Mbiemri = builder.Configuration["SeedAdmin:Mbiemri"] ?? "Sistem",
+      SecurityStamp = Guid.NewGuid().ToString(),
+    };
+    var createResult = await userManager.CreateAsync(adminUser, adminPassword);
+    if (createResult.Succeeded)
+    {
+      await userManager.AddToRoleAsync(adminUser, adminRole);
+      Console.WriteLine($"[Seed] U krijua përdoruesi Administrator: {adminUserName}. Ndryshoni fjalëkalimin pas kyçjes.");
+    }
+  }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

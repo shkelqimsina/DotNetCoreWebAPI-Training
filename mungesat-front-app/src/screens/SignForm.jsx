@@ -10,7 +10,7 @@ import RegisterForm from "../components/RegisterForm";
 import "../styles/screens/signForm.css";
 
 function SignForm() {
-  const [onSignIn, setOnSignIn] = useState(true);
+  const [onSignIn] = useState(true);
 
   return (
     <div
@@ -31,18 +31,7 @@ function SignForm() {
             <span className="fw-normal">eMungesat është e thjeshtë</span>
           </h1>
           <p className="mb-0">
-            {" "}
-            Nëse {onSignIn ? "nuk ke" : "ke"} një llogari,{" "}
-            {onSignIn ? "regjistrohu" : "kyçu"}!
-          </p>
-          <p>
-            Ti mund të{" "}
-            <span
-              onClick={() => setOnSignIn(!onSignIn)}
-              className="register-here fw-bold text-decoration-none"
-            >
-              {onSignIn ? "Regjistrohesh " : "Kyçesh"} këtu!
-            </span>
+            Kyçja bëhet vetëm me llogari të krijuar nga administratori ose drejtori i shkollës.
           </p>
         </div>
         <img

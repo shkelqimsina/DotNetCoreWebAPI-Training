@@ -30,7 +30,9 @@ function SignForm() {
             {onSignIn ? " Kyçja" : "Regjistrimi"} tek <br />{" "}
             <span className="fw-normal">eMungesat është e thjeshtë</span>
           </h1>
-          <p className="mb-0">Kyçja bëhet vetëm me llogari të krijuar nga administratori.</p>
+          <p className="mb-0">
+            Kyçja bëhet vetëm me llogari të krijuar nga administratori ose drejtori i shkollës.
+          </p>
         </div>
         <img
           src={manStanding}

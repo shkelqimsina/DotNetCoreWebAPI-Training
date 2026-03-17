@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AddButton from "../components/Button";
 import Input from "../components/Input";
@@ -9,13 +9,15 @@ import axios from "../axiosInstance";
 
 function StudentAdd() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const preselectedKlasatId = location.state?.klasatId;
   const [emri, setEmri] = useState("");
   const [mbiemri, setMbiemri] = useState("");
   const [ditelindja, setDitelindja] = useState("");
   const [gjinia, setGjinia] = useState("");
   const [adresa, setAdresa] = useState("");
   const [prindi, setPrindi] = useState("");
-  const [klasatId, setKlasatId] = useState("");
+  const [klasatId, setKlasatId] = useState(preselectedKlasatId ? String(preselectedKlasatId) : "");
   const [klasat, setKlasat] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,13 +33,14 @@ function StudentAdd() {
       const myKlasatId = me.klasatId ?? me.KlasatId;
       if (myKlasatId != null && (me.isKujdestar || me.role === "Kujdestar")) {
         setKlasat(allKlasat.filter((k) => (k.id ?? k.Id) === myKlasatId));
-        setKlasatId(String(myKlasatId));
+        setKlasatId(String(preselectedKlasatId ?? myKlasatId));
       } else {
         setKlasat(allKlasat);
+        if (preselectedKlasatId) setKlasatId(String(preselectedKlasatId));
       }
     };
     load();
-  }, []);
+  }, [preselectedKlasatId]);
 
   const handleBackClick = () => {
     navigate("/student");

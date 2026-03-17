@@ -11,12 +11,16 @@ function Class() {
   const navigate = useNavigate();
   const [klasat, setKlasat] = useState([]);
   const [nxenesit, setNxenesit] = useState([]);
-  const [me, setMe] = useState(null);
   const [expandedKlasaId, setExpandedKlasaId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
-  const { role } = useContext(AuthContext);
-  const isKujdestar = role === "Kujdestar";
+  const { role, me: meAuth } = useContext(AuthContext);
+  const [meFromApi, setMeFromApi] = useState(null);
+  const me = meFromApi ?? meAuth;
+  const isKujdestar = (me?.isKujdestar === true) || role === "Kujdestar";
+  const isAdministrator = (me?.isAdministrator === true) || role === "Administrator";
+  const isDrejtori = (me?.isDrejtori === true) || role === "Drejtori";
+  const canAddClass = isAdministrator || isDrejtori;
 
   const handleAddClick = () => {
     navigate("/class-add");
@@ -25,24 +29,21 @@ function Class() {
   const loadData = React.useCallback(async () => {
     setError("");
     try {
-      const requests = [axios.get("/Klasat"), axios.get("/Nxenesit")];
-      if (isKujdestar) {
-        requests.push(axios.get("/account/me"));
-      }
+      const requests = [axios.get("/Klasat"), axios.get("/Nxenesit"), axios.get("/account/me")];
       const results = await Promise.all(requests);
       const klasRes = results[0];
       const nxenesitRes = results[1];
       const meRes = results[2];
       setKlasat(Array.isArray(klasRes.data) ? klasRes.data : []);
       setNxenesit(Array.isArray(nxenesitRes?.data) ? nxenesitRes.data : []);
-      if (meRes?.data) setMe(meRes.data);
+      if (meRes?.data) setMeFromApi(meRes.data);
     } catch {
       setKlasat([]);
       setNxenesit([]);
-      setMe(null);
+      setMeFromApi(null);
       setError("Të dhënat nuk u ngarkuan.");
     }
-  }, [isKujdestar]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -70,10 +71,7 @@ function Class() {
     }
   };
 
-  const klasatPerTregim =
-    isKujdestar && me?.klasatId
-      ? klasat.filter((k) => (k.kujdestariId ?? k.KujdestariId) === me.klasatId)
-      : klasat;
+  const klasatPerTregim = klasat;
 
   const nxenesitNgaKlasaId = (klasatId) =>
     nxenesit.filter((n) => (n.klasatId ?? n.KlasatId) === klasatId);
@@ -88,7 +86,7 @@ function Class() {
       <div className="w-100 p-5">
         <div className="w-100 d-flex justify-content-between align-items-center">
           <h1>Klasët</h1>
-          <AddButton onClick={handleAddClick} type="button">Shto Klasë</AddButton>
+          {canAddClass && <AddButton onClick={handleAddClick} type="button">Shto Klasë</AddButton>}
         </div>
         {error && (
           <div className="alert alert-warning mt-3 mb-0">{error}</div>
@@ -106,8 +104,10 @@ function Class() {
           {klasatPerTregim.length === 0 ? (
             <div className="d-flex flex-column justify-content-center align-items-center h-100">
               <h2>Nuk ka asnjë klasë</h2>
-              <p className="text-secondary mb-4">Klasët shfaqen këtu pasi t'i shtoni.</p>
-              <AddButton onClick={handleAddClick} type="button">Shto klasë të parë</AddButton>
+              <p className="text-secondary mb-4">
+                {canAddClass ? "Klasët shfaqen këtu pasi t'i shtoni." : "Nuk ju është caktuar ende asnjë klasë. Drejtori ose administratori do t'ju caktojë një klasë."}
+              </p>
+              {canAddClass && <AddButton onClick={handleAddClick} type="button">Shto klasë të parë</AddButton>}
             </div>
           ) : (
             <div className="table-responsive">

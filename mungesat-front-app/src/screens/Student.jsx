@@ -85,7 +85,9 @@ function Student() {
     }
   };
 
-  const handleAddClick = () => navigate("/student-add");
+  const handleAddClick = (preselectedKlasatId) => {
+    navigate("/student-add", { state: preselectedKlasatId ? { klasatId: preselectedKlasatId } : undefined });
+  };
 
   const handleDelete = async (id, emri, mbiemri) => {
     const emriPlote = [emri, mbiemri].filter(Boolean).join(" ").trim() || "ky nxënës";
@@ -113,15 +115,18 @@ function Student() {
     <div className="teacher h-100 w-100 d-flex">
       <Sidebar />
       <div className="w-100 p-5">
-        <div className="w-100 d-flex justify-content-between align-items-center">
+        <div className="w-100 d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h1>Nxënësit</h1>
-          {selectedKlasaId ? (
-            <AddButton onClick={() => setSelectedKlasaId(null)} type="button">
-              Kthehu te klasat
-            </AddButton>
-          ) : (
-            <AddButton onClick={handleAddClick} type="button">Shto Nxënës</AddButton>
-          )}
+          <span className="d-flex gap-2">
+            {selectedKlasaId && (
+              <AddButton onClick={() => setSelectedKlasaId(null)} type="button">
+                Kthehu te klasat
+              </AddButton>
+            )}
+            {(canRegisterParent || isAdministrator) && (
+              <AddButton onClick={() => handleAddClick(selectedKlasaId)} type="button">Shto Nxënës</AddButton>
+            )}
+          </span>
         </div>
         <div className="mt-4 d-flex justify-content-start align-items-center">
           <Dropdown main="Filtro" option1="Emri" option2="Mbiemri" option3="Email" />

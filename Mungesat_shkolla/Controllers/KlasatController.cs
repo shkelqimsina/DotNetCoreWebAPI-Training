@@ -6,6 +6,7 @@ using Mungesat_shkolla.Data;
 using Mungesat_shkolla.DTO;
 using Mungesat_shkolla.Models;
 using Mungesat_shkolla.Repositories;
+using System.Security.Claims;
 
 namespace Mungesat_shkolla.Controllers
 {
@@ -24,11 +25,26 @@ namespace Mungesat_shkolla.Controllers
             this.klasatRepository = klasatRepository;
         }
 
+        private int? GetCurrentUserId()
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            return sub != null && int.TryParse(sub, out var id) ? id : null;
+        }
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAsync()
         {
-            var klasat = await klasatRepository.GetAsync();
+            List<Models.Klasat> klasat;
+            if (User.IsInRole("Kujdestar") && !User.IsInRole("Administrator") && !User.IsInRole("Drejtori"))
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null) return Ok(new List<KlasatDto>());
+                var klasa = await dbContext.Klasat.Include(k => k.Kujdestari).FirstOrDefaultAsync(k => k.KujdestariId == userId);
+                klasat = klasa == null ? new List<Models.Klasat>() : new List<Models.Klasat> { klasa };
+            }
+            else
+                klasat = await klasatRepository.GetAsync();
             var klasadto = mapper.Map<List<KlasatDto>>(klasat);
             for (int i = 0; i < klasat.Count; i++)
             {
@@ -49,6 +65,13 @@ namespace Mungesat_shkolla.Controllers
             var klasa = await klasatRepository.GetByIdAsync(id);
             if (klasa == null)
                 return NotFound();
+
+            if (User.IsInRole("Kujdestar") && !User.IsInRole("Administrator") && !User.IsInRole("Drejtori"))
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null || klasa.KujdestariId != userId)
+                    return Forbid();
+            }
 
             var dto = mapper.Map<KlasatDto>(klasa);
             if (klasa.Kujdestari != null)

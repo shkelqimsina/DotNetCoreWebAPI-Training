@@ -35,9 +35,18 @@ function ClassAdd() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    const emriTrim = (emri ?? "").trim();
+    if (!emriTrim) {
+      setError("Shkruani emrin e klasës.");
+      return;
+    }
+    if (!kujdestariId) {
+      setError("Zgjidhni kujdestarin e klasës.");
+      return;
+    }
     setLoading(true);
     try {
-      await axios.post("/Klasat", { emri, kujdestariId: parseInt(kujdestariId, 10) });
+      await axios.post("/Klasat", { emri: emriTrim, kujdestariId: parseInt(kujdestariId, 10) });
       navigate("/class");
     } catch (err) {
       let msg = err.response?.data?.errors?.join?.(" ") || err.response?.data?.message || err.message || "Dështoi shtimi i klasës.";
@@ -89,7 +98,11 @@ function ClassAdd() {
                 );
               })}
             </select>
-            <SignButton type="submit" className="sign-btn border-0 rounded-3 fw-semibold mt-3" disabled={loading}>
+            <SignButton
+              type="submit"
+              className="sign-btn border-0 rounded-3 fw-semibold mt-3"
+              disabled={loading || !kujdestariId || !(emri ?? "").trim()}
+            >
               {loading ? "Duke u shtuar…" : "Shto Klasën"}
             </SignButton>
           </form>

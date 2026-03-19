@@ -3,12 +3,44 @@
   padding: 0 100px;
 }
 
+.sign-hero-header {
+  left: 100px;
+  top: 0;
+  max-width: min(760px, calc(100% - 200px));
+}
+
+.school-logo {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+  padding: 10px;
+}
+
+.welcome-text {
+  margin-top: 6px;
+  font-size: 1.08rem;
+  line-height: 1.25;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(17, 24, 39, 0.72);
+}
+
+.welcome-brand {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
 .sign-text {
   margin-top: 15%;
 }
 
 .logo {
-  max-width: 150px;
+  max-width: 190px;
   width: 80%;
 }
 
@@ -47,6 +79,20 @@
     padding: 0 60px;
   }
 
+  .sign-hero-header {
+    left: 60px;
+    max-width: calc(100% - 120px);
+  }
+
+  .school-logo {
+    width: 104px;
+    height: 104px;
+  }
+
+  .logo {
+    max-width: 180px;
+  }
+
   .sign-form {
     margin-top: 50px;
   }
@@ -56,11 +102,49 @@
   .signForm {
     padding: 0 70px;
   }
+
+  .sign-hero-header {
+    left: 70px;
+    max-width: calc(100% - 140px);
+  }
+
+  .school-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .logo {
+    max-width: 170px;
+  }
+
+  .welcome-text {
+    font-size: 1.02rem;
+  }
 }
 
 @media screen and (max-width: 500px) {
   .signForm {
     padding: 0 20px;
+  }
+
+  .sign-hero-header {
+    left: 20px;
+    max-width: calc(100% - 40px);
+  }
+
+  .school-logo {
+    width: 84px;
+    height: 84px;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .logo {
+    max-width: 160px;
+  }
+
+  .welcome-text {
+    font-size: 0.98rem;
   }
 
   .sign-text {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import eMungesat from "../assets/logos/eMungesat.png";
+import schoolLogo from "../assets/logos/schoolLogo.png";
 import manStanding from "../assets/images/manStanding.svg";
 import LoginForm from "../components/LoginForm";
 import RegisterForm from "../components/RegisterForm";
@@ -17,12 +18,25 @@ function SignForm() {
       className="signForm position-relative d-flex flex-column flex-lg-row"
       style={{ color: "black" }}
     >
-      <img
-        src={eMungesat}
-        alt="eMungesat logo"
-        className="logo position-absolute py-4"
-        draggable="false"
-      />
+      <div className="sign-hero-header position-absolute py-4 d-flex align-items-center gap-3">
+        <img
+          src={schoolLogo}
+          alt="Logo e shkollës"
+          className="school-logo"
+          draggable="false"
+        />
+        <div className="d-flex flex-column">
+          <img
+            src={eMungesat}
+            alt="eMungesat logo"
+            className="logo"
+            draggable="false"
+          />
+          <div className="welcome-text">
+            Mirësevini në <span className="welcome-brand">eMungesat</span> – shkolla “Lufti Musiqi” Vushtrri
+          </div>
+        </div>
+      </div>
 
       <div className="sign-text d-flex w-100 w-lg-75">
         <div className="d-flex flex-column gap-2">
